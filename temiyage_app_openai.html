@@ -250,12 +250,14 @@ input[type=range] { width: 100%; accent-color: #1c1c1e; height: 4px; }
 
   <div class="section">
     <div class="lbl">渡す日</div>
-    <div style="display:flex;align-items:center;gap:8px">
+    <div style="position:relative;display:inline-block;width:100%">
+      <div id="date-btn" onclick="document.getElementById('date-input').focus()"
+        style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;border:1px solid #d1d1d6;background:#fff;cursor:pointer">
+        <span id="date-display-text" style="font-size:14px;color:#8e8e93">タップして日付を選ぶ</span>
+        <span id="date-clear" style="display:none;font-size:18px;color:#8e8e93" onclick="event.stopPropagation();clearDate()">×</span>
+      </div>
       <input type="date" id="date-input" onchange="setDate(this.value)"
-        style="font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid #d1d1d6;background:#fff;color:#1c1c1e;width:44px;-webkit-appearance:none;cursor:pointer"
-        onfocus="this.style.width='100%'" onblur="this.value?this.style.width='44px':this.style.width='44px'">
-      <span id="date-display-text" style="font-size:14px;color:#8e8e93">タップして日付を選ぶ</span>
-      <span id="date-clear" style="display:none;font-size:20px;color:#8e8e93;cursor:pointer;padding:4px" onclick="clearDate()">×</span>
+        style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1">
     </div>
   </div>
 
