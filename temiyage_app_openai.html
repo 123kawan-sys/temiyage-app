@@ -252,10 +252,11 @@ input[type=range] { width: 100%; accent-color: #1c1c1e; height: 4px; }
     <div class="lbl">渡す日</div>
     <div style="display:flex;align-items:center;gap:8px">
       <input type="date" id="date-input" onchange="setDate(this.value)"
-        style="font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid #d1d1d6;background:#fff;color:#1c1c1e;flex:1;-webkit-appearance:none">
+        style="font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid #d1d1d6;background:#fff;color:#1c1c1e;width:44px;-webkit-appearance:none;cursor:pointer"
+        onfocus="this.style.width='100%'" onblur="this.value?this.style.width='44px':this.style.width='44px'">
+      <span id="date-display-text" style="font-size:14px;color:#8e8e93">タップして日付を選ぶ</span>
       <span id="date-clear" style="display:none;font-size:20px;color:#8e8e93;cursor:pointer;padding:4px" onclick="clearDate()">×</span>
     </div>
-    <div style="font-size:11px;color:#8e8e93;margin-top:5px">タップするとカレンダーが開きます</div>
   </div>
 
   <div class="section">
@@ -570,12 +571,20 @@ function selectRegion(v) { S.region=v; renderRegionChips(); updateGoBtn(); }
 
 function setDate(v) {
   S.date = v;
-  document.getElementById('date-clear').style.display = v ? 'inline' : 'none';
+  if (v) {
+    const d = new Date(v + 'T00:00:00');
+    const txt = (d.getMonth()+1) + '月' + d.getDate() + '日';
+    document.getElementById('date-display-text').textContent = txt;
+    document.getElementById('date-display-text').style.color = '#1c1c1e';
+    document.getElementById('date-clear').style.display = 'inline';
+  }
 }
 function clearDate() {
   S.date = '';
   const el = document.getElementById('date-input');
   if (el) el.value = '';
+  document.getElementById('date-display-text').textContent = 'タップして日付を選ぶ';
+  document.getElementById('date-display-text').style.color = '#8e8e93';
   document.getElementById('date-clear').style.display = 'none';
 }
 
