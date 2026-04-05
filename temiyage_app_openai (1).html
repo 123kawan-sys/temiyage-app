@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="手土産アプリ">
-<title>手土産選定アプリ</title>
+<title>手土産アプリ</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif; background: #f5f5f7; color: #1c1c1e; max-width: 480px; margin: 0 auto; min-height: 100vh; }
@@ -200,6 +200,9 @@ input[type=range] { width: 100%; accent-color: #1c1c1e; height: 4px; }
 </head>
 <body>
 
+<div style="background:#1c1c1e;padding:12px 16px 10px;text-align:center">
+  <span style="color:#fff;font-size:16px;font-weight:700;letter-spacing:0.05em">手土産アプリ</span>
+</div>
 <div class="nav">
   <button class="nav-btn active" onclick="showPage('search')">候補検索</button>
   <button class="nav-btn" onclick="showPage('history')">履歴</button>
@@ -248,25 +251,14 @@ input[type=range] { width: 100%; accent-color: #1c1c1e; height: 4px; }
   <div class="section">
     <div class="lbl">渡す日</div>
     <div class="date-row">
-      <span class="date-display empty" id="date-display">未選択</span>
-      <input type="date" id="date-input" onchange="setDate(this.value)" style="font-size:13px;padding:7px 12px;border-radius:10px;border:1px solid #d1d1d6;background:#fff;color:#1c1c1e;width:auto">
-      <span class="date-clear" id="date-clear" style="display:none" onclick="clearDate()">×</span>
+      <input type="date" id="date-input" onchange="setDate(this.value)" style="font-size:14px;padding:8px 12px;border-radius:10px;border:1px solid #d1d1d6;background:#fff;color:#1c1c1e;flex:1">
+      <span class="date-clear" id="date-clear" style="display:none;font-size:18px;color:#8e8e93;cursor:pointer;padding:4px" onclick="clearDate()">×</span>
     </div>
   </div>
 
   <div class="section">
-    <div class="lbl">予算上限</div>
-    <div class="budget-header">
-      <span style="font-size:13px;color:#8e8e93">上限金額</span>
-      <span class="budget-val" id="budget-display">¥5,000</span>
-    </div>
-    <input type="range" min="1000" max="15000" step="500" value="5000" id="budget-slider" oninput="setBudget(this.value)">
-    <div class="budget-ticks">
-      <span class="budget-tick">¥1,000</span>
-      <span class="budget-tick">¥5,000</span>
-      <span class="budget-tick">¥10,000</span>
-      <span class="budget-tick">¥15,000</span>
-    </div>
+    <div class="lbl">予算レンジ</div>
+    <div class="chips" id="budget-chips"></div>
   </div>
 
   <div class="section">
@@ -418,32 +410,32 @@ const DEPTS = {
   'PM': ['小島','森崎','中村聖','鳥海','矢島','奥村','宮園','下田','栗林','村田','空閑','中村美','萩原','西山','池田','藤田'],
 };
 
-const HISTORY_DATA = [
-  {company:'丸紅不動産', date:'03/15', name:'焼菓子詰合せ B', detail:'ASAKOIWAYANAGI｜焼菓子各種｜¥3,013', person:'久積', purpose:'訪問', delivery:false},
-  {company:'丸紅不動産', date:'01/10', name:'すずのね（2）', detail:'鈴懸｜心葉6個・草月6個｜¥2,765', person:'河埜', purpose:'御礼', delivery:false},
-  {company:'三菱地所AM', date:'03/20', name:'フクオカ アルティザン 4P', detail:'DIVA（リッツカールトン）｜ボンボンショコラ4個｜¥2,000', person:'小島', purpose:'会食', delivery:true},
-  {company:'三菱地所AM', date:'12/05', name:'ギフトBOX', detail:'ASAKOIWAYANAGI｜焼菓子3種・チョコ｜¥1,674', person:'森崎', purpose:'訪問', delivery:false},
-  {company:'九州銀行', date:'02/28', name:'最中 12個入', detail:'とらや（岩田屋）｜最中12個｜¥3,240', person:'宮原', purpose:'謝罪', delivery:false},
-  {company:'福岡地所', date:'03/01', name:'オリジナルだしスープ', detail:'DIVA（リッツカールトン）｜だしパック8個入｜¥2,400', person:'鳥海', purpose:'会食', delivery:false},
-];
+const HISTORY_DATA_DEMO = [];
 
 // State
 const S = {
   dept:'BR', person:null, purpose:null, role:null, headcount:null, region:null,
-  date:'', budget:5000, delivery:false, deliveryTo:'', deliveryAddr:'',
+  date:'', budgetMin:0, budgetMax:15000, budgetLabel:'指定なし', delivery:false, deliveryTo:'', deliveryAddr:'',
   hFilter:'すべて',
   catFilter:'すべて',
   deleteTarget:null,
   photo1:false, photo2:false,
   addPurposes:[], addSeason:null,
   pickedGift:null,
-  orderMethod:'メール', orderSent:false,
+  orderMethod:'コピー', orderSent:false,
+  orderCompany:'',
   gifts:[],
+  historyData:[],
   sheetsLoaded:false,
 };
 
 // ===== INIT =====
 window.onload = async () => {
+  const savedKey = localStorage.getItem('openai_api_key');
+  if (savedKey) document.getElementById('api-key').value = savedKey;
+  document.getElementById('api-key').addEventListener('input', function() {
+    if (this.value.startsWith('sk-')) localStorage.setItem('openai_api_key', this.value);
+  });
   renderDeptTabs();
   renderMemberChips();
   renderPurposeChips();
@@ -451,6 +443,7 @@ window.onload = async () => {
   renderHeadcountChips();
   renderRegionChips();
   renderDeliveryChips();
+  renderBudgetChips();
   renderAddPurposeChips();
   renderSeasonChipsAdd();
   renderCatFilters();
@@ -463,6 +456,22 @@ async function loadGiftsFromSheets() {
   try {
     const res = await fetch(SHEETS_URL);
     const data = await res.json();
+    // 履歴シートのデータも読み込む
+    try {
+      const hres = await fetch(SHEETS_URL + '?sheet=履歴');
+      const hdata = await hres.json();
+      if (Array.isArray(hdata)) {
+        S.historyData = hdata.map(r => ({
+          company: r['お渡し先'] || '',
+          date: r['日付'] || '',
+          name: r['商品名'] || '',
+          detail: (r['店舗名']||'') + '｜' + (r['内容']||'') + '｜¥' + (r['価格']||''),
+          person: r['発注者'] || '',
+          purpose: r['目的'] || '',
+          delivery: r['持参配送'] === '配送',
+        })).filter(r => r.company);
+      }
+    } catch(e2) { console.log('履歴読み込みエラー:', e2); }
     if (Array.isArray(data) && data.length > 0) {
       S.gifts = data.map((row, i) => ({
         id: row['ID'] || i+1,
@@ -557,25 +566,37 @@ function selectRegion(v) { S.region=v; renderRegionChips(); updateGoBtn(); }
 
 function setDate(v) {
   S.date = v;
-  const d = new Date(v);
-  const disp = document.getElementById('date-display');
-  disp.textContent = `${d.getMonth()+1}月${d.getDate()}日`;
-  disp.classList.remove('empty');
   document.getElementById('date-clear').style.display = 'inline';
 }
 function clearDate() {
   S.date = '';
-  const disp = document.getElementById('date-display');
-  disp.textContent = '未選択';
-  disp.classList.add('empty');
   document.getElementById('date-clear').style.display = 'none';
   document.getElementById('date-input').value = '';
 }
 
 
-function setBudget(v) {
-  S.budget = Number(v);
-  document.getElementById('budget-display').textContent = '¥' + S.budget.toLocaleString();
+const BUDGET_OPTIONS = [
+  {label:'指定なし', min:0, max:99999},
+  {label:'〜¥3,000', min:0, max:3000},
+  {label:'¥3,000〜¥5,000', min:3000, max:5000},
+  {label:'¥5,000〜¥10,000', min:5000, max:10000},
+  {label:'¥10,000〜¥15,000', min:10000, max:15000},
+];
+
+function renderBudgetChips() {
+  const el = document.getElementById('budget-chips');
+  if (!el) return;
+  el.innerHTML = BUDGET_OPTIONS.map(o =>
+    `<div class="chip ${S.budgetLabel===o.label?'on':''}" onclick="selectBudget('${o.label}',${o.min},${o.max})">${o.label}</div>`
+  ).join('');
+}
+
+function selectBudget(label, min, max) {
+  S.budgetLabel = label;
+  S.budgetMin = min;
+  S.budgetMax = max;
+  renderBudgetChips();
+  updateGoBtn();
 }
 
 function renderDeliveryChips() {
@@ -589,6 +610,7 @@ function renderDeliveryChips() {
 function selectDelivery(v) {
   S.delivery = (v==='配送');
   renderDeliveryChips();
+  renderBudgetChips();
   if (S.delivery) {
     const el = document.getElementById('delivery-to-chips');
     el.innerHTML = ['先方オフィス','ホテル','自宅'].map(t =>
@@ -632,8 +654,14 @@ async function generateCandidates() {
   resultArea.innerHTML = '<div class="loading"><div class="spinner"></div>AIが候補を選定しています...</div>';
 
   const dl = daysLeft();
-  const budget = S.budget;
-  const filtered = S.gifts.filter(g => !g.price || g.price <= budget);
+  const budget = S.budgetMax;
+  const budgetMin = S.budgetMin;
+  const filtered = S.gifts.filter(g => {
+    if (S.budgetLabel === '指定なし') return true;
+    if (g.price && g.price > budget) return false;
+    if (budgetMin > 0 && g.price && g.price < budgetMin) return false;
+    return true;
+  });
 
   const regionCtx = {
     '福岡（地元）': '相手は福岡在住のため、定番品は避け特別感のある品・季節限定品を優先。',
@@ -650,7 +678,7 @@ async function generateCandidates() {
 - ${S.purpose==='会食'?'参加人数':'訪問先人数'}：${S.headcount}
 - 相手の所在地：${S.region}
 - 渡す日：${S.date||'未定'}${dl!==null?`（${dl}日後）`:''}
-- 予算上限：¥${budget.toLocaleString()}
+- 予算レンジ：${S.budgetLabel==='指定なし'?'指定なし':'¥'+budgetMin.toLocaleString()+'〜¥'+budget.toLocaleString()}
 - ${S.delivery?`配送先：${S.deliveryTo} ${document.getElementById('delivery-addr').value}`:'持参'}
 - 所在地方針：${regionCtx}
 
@@ -766,19 +794,36 @@ function renderOrderSheet() {
       <div class="modal-handle"></div>
       <div class="sent-wrap">
         <div class="sent-icon">✓</div>
-        <div style="font-size:18px;font-weight:700;margin-bottom:8px">送信しました</div>
-        <div style="font-size:14px;color:#8e8e93;line-height:1.7">${S.orderMethod}で発注情報を送信しました。<br>担当者が確認次第、手配されます。</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px">発注・履歴記録完了</div>
+        <div style="font-size:14px;color:#8e8e93;line-height:1.7">履歴に記録しました。</div>
         <button class="save-btn" style="margin-top:24px" onclick="document.getElementById('order-overlay').classList.remove('open');document.getElementById('modal-overlay').classList.remove('open')">閉じる</button>
       </div>`;
     return;
   }
-  const summary = `【手土産発注】\n商品：${g.name}\n店舗：${g.shop}（${g.loc}）\n価格：¥${g.price?g.price.toLocaleString():'要確認'}\n発注者：${S.person}（${S.dept}）\n目的：${S.purpose}\n人数：${S.headcount}\n渡す日：${S.date||'未定'}\n${S.delivery?`配送先：${S.deliveryTo} ${document.getElementById('delivery-addr').value}`:'持参'}`;
+
+  // 過去のお渡し先候補を取得
+  const pastCompanies = [...new Set(S.historyData.map(h=>h.company))].filter(Boolean);
+
+  const summary = `【手土産発注】\nお渡し先：${S.orderCompany||'未入力'}\n商品：${g.name}\n店舗：${g.shop}（${g.loc}）\n価格：¥${g.price?g.price.toLocaleString():'要確認'}\n発注者：${S.person}（${S.dept}）\n目的：${S.purpose}\n人数：${S.headcount}\n渡す日：${S.date||'未定'}\n${S.delivery?`配送先：${S.deliveryTo}`:'持参'}`;
 
   document.getElementById('order-content').innerHTML = `
     <div class="modal-handle"></div>
-    <div class="order-title">手土産発注</div>
-    <div class="order-sub">以下の内容を担当者に送信します</div>
-    <div class="order-summary">
+    <div class="order-title">手土産発注・履歴記録</div>
+    <div class="order-sub">お渡し先を入力して記録してください</div>
+
+    <div class="lbl" style="margin-bottom:6px">お渡し先の会社名</div>
+    <input type="text" id="order-company" placeholder="例：丸紅不動産" value="${S.orderCompany||''}"
+      oninput="S.orderCompany=this.value;updateCompanySuggestions()"
+      style="margin-bottom:6px;font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid #d1d1d6;width:100%">
+    ${pastCompanies.length > 0 ? `
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:#8e8e93;margin-bottom:5px">過去のお渡し先：</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px" id="company-suggestions">
+        ${pastCompanies.map(c=>`<div style="font-size:12px;padding:4px 10px;border-radius:14px;border:1px solid #d1d1d6;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <div class="order-summary" style="margin-bottom:12px">
       商品：<span>${g.name}</span><br>
       店舗：<span>${g.shop}（${g.loc}）</span><br>
       価格：<span>¥${g.price?g.price.toLocaleString():'要確認'}</span><br>
@@ -786,35 +831,74 @@ function renderOrderSheet() {
       目的：<span>${S.purpose}</span><br>
       人数：<span>${S.headcount}</span><br>
       渡す日：<span>${S.date||'未定'}</span><br>
-      ${S.delivery?`配送先：<span>${S.deliveryTo||'—'}${document.getElementById('delivery-addr').value?' / '+document.getElementById('delivery-addr').value:''}</span>`:'持参'}
+      ${S.delivery?`配送先：<span>${S.deliveryTo||'—'}</span>`:'持参'}
     </div>
-    <div class="lbl" style="margin-bottom:8px">送信方法</div>
-    <div class="send-methods">
-      ${['メール','LINE','コピー'].map(m=>`<div class="send-method ${S.orderMethod===m?'on':''}" onclick="selectOrderMethod('${m}')">${m}</div>`).join('')}
-    </div>
-    <div class="send-input" id="order-input-area">
-      ${S.orderMethod==='メール'?`<div class="field-lbl">送り先メールアドレス</div><input type="text" placeholder="order@company.com">`:
-        S.orderMethod==='LINE'?`<div class="field-lbl">送信先LINEグループ</div><select><option>営業チームグループ</option><option>手土産発注グループ</option></select>`:
-        `<div style="background:#f2f2f7;border-radius:10px;padding:10px 12px;font-size:12px;color:#8e8e93;white-space:pre-wrap;line-height:1.8">${summary}</div>`}
-    </div>
-    <button class="send-execute" onclick="sendOrder('${summary.replace(/'/g,"\\'")}')">
-      ${S.orderMethod==='コピー'?'クリップボードにコピー':'送信する ↗'}
+
+    <button class="send-execute" onclick="sendOrder()" ${!S.orderCompany?'disabled style="opacity:0.35"':''}>
+      履歴に記録する ↗
     </button>
-    <button class="order-back" onclick="document.getElementById('order-overlay').classList.remove('open')">戻る</button>
+    <button class="order-back" style="margin-top:8px;width:100%;padding:12px;font-size:14px;border-radius:14px;border:1px solid #d1d1d6;background:none;color:#8e8e93;cursor:pointer" onclick="document.getElementById('order-overlay').classList.remove('open')">戻る</button>
   `;
 }
+
+function selectCompany(c) {
+  S.orderCompany = c;
+  renderOrderSheet();
+}
+
+function updateCompanySuggestions() {
+  renderOrderSheet();
+}
+
 function selectOrderMethod(m) { S.orderMethod=m; renderOrderSheet(); }
-function sendOrder(summary) {
-  if (S.orderMethod === 'コピー') {
-    navigator.clipboard?.writeText(summary).catch(()=>{});
+
+async function sendOrder() {
+  const g = S.pickedGift;
+  if (!S.orderCompany) return;
+
+  // 履歴データをローカルに追加
+  const today = new Date();
+  const dateStr = (today.getMonth()+1) + '/' + today.getDate();
+  const newRecord = {
+    company: S.orderCompany,
+    date: S.date ? S.date.slice(5).replace('-','/') : dateStr,
+    name: g.name,
+    detail: g.shop + '｜' + (g.detail||'') + '｜¥' + (g.price?g.price.toLocaleString():'要確認'),
+    person: S.person,
+    purpose: S.purpose,
+    delivery: S.delivery,
+  };
+  S.historyData.unshift(newRecord);
+
+  // Googleスプレッドシートに書き込む
+  try {
+    const row = [
+      S.orderCompany,
+      g.name,
+      g.shop,
+      g.detail||'',
+      g.price||'',
+      S.person + '（' + S.dept + '）',
+      S.purpose,
+      S.headcount,
+      S.date||'',
+      S.delivery ? '配送' : '持参',
+      S.deliveryTo||'',
+      new Date().toLocaleDateString('ja-JP'),
+    ];
+    await fetch(SHEETS_URL + '?action=addHistory&data=' + encodeURIComponent(JSON.stringify(row)));
+  } catch(e) {
+    console.log('履歴書き込みエラー:', e);
   }
+
   S.orderSent = true;
   renderOrderSheet();
+  renderHistoryFilters();
 }
 
 // ===== HISTORY =====
 function renderHistoryFilters() {
-  const companies = ['すべて', ...new Set(HISTORY_DATA.map(h=>h.company))];
+  const companies = ['すべて', ...new Set(S.historyData.map(h=>h.company))];
   const el = document.getElementById('history-filters');
   el.innerHTML = companies.map(c =>
     `<div class="filter-chip ${S.hFilter===c?'on':''}" onclick="selectHFilter('${c}')">${c}</div>`
@@ -824,7 +908,7 @@ function selectHFilter(c) { S.hFilter=c; renderHistoryFilters(); renderHistory()
 
 function renderHistory() {
   const q = (document.getElementById('history-search')?.value||'').trim();
-  let filtered = HISTORY_DATA;
+  let filtered = S.historyData;
   if (q) filtered = filtered.filter(h=>h.company.includes(q)||h.name.includes(q)||h.person.includes(q));
   if (S.hFilter!=='すべて') filtered = filtered.filter(h=>h.company===S.hFilter);
   const grouped = {};
