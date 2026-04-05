@@ -250,12 +250,11 @@ input[type=range] { width: 100%; accent-color: #1c1c1e; height: 4px; }
 
   <div class="section">
     <div class="lbl">渡す日</div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <label for="date-input" style="display:flex;align-items:center;gap:6px;padding:10px 16px;border-radius:10px;border:1px solid #d1d1d6;background:#fff;cursor:pointer;font-size:14px;color:#1c1c1e;min-width:120px">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8e8e93" stroke-width="1.5"><rect x="1" y="3" width="14" height="12" rx="2"/><path d="M1 7h14M5 1v4M11 1v4"/></svg>
-        <span id="date-display-label">日付を選ぶ</span>
-      </label>
-      <input type="date" id="date-input" onchange="setDate(this.value)" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none">
+    <div style="display:flex;align-items:center;gap:8px">
+      <input type="text" id="date-input-text" placeholder="例：4/9" maxlength="5"
+        style="font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid #d1d1d6;background:#fff;color:#1c1c1e;width:120px"
+        oninput="setDateText(this.value)">
+      <span style="font-size:13px;color:#8e8e93">（月/日）</span>
       <span id="date-clear" style="display:none;font-size:20px;color:#8e8e93;cursor:pointer" onclick="clearDate()">×</span>
     </div>
   </div>
@@ -454,22 +453,7 @@ window.onload = async () => {
   renderHistoryFilters();
   await loadGiftsFromSheets();
 
-  // 日付ラベルクリックでカレンダーを開く
-  document.querySelector('label[for=date-input]').addEventListener('click', function(e) {
-    e.preventDefault();
-    const input = document.getElementById('date-input');
-    input.style.position = 'fixed';
-    input.style.top = '50%';
-    input.style.left = '50%';
-    input.style.opacity = '0';
-    input.style.width = '1px';
-    input.style.height = '1px';
-    input.focus();
-    input.click();
-    setTimeout(() => {
-      input.style.position = 'absolute';
-    }, 100);
-  });
+
 };
 
 // ===== SHEETS =====
@@ -585,19 +569,16 @@ function renderRegionChips() {
 }
 function selectRegion(v) { S.region=v; renderRegionChips(); updateGoBtn(); }
 
-function setDate(v) {
+function setDateText(v) {
   S.date = v;
-  const d = new Date(v + 'T00:00:00');
-  document.getElementById('date-display-label').textContent = (d.getMonth()+1) + '月' + d.getDate() + '日';
-  document.getElementById('date-display-label').style.color = '#1c1c1e';
-  document.getElementById('date-clear').style.display = 'inline';
+  document.getElementById('date-clear').style.display = v ? 'inline' : 'none';
 }
+function setDate(v) { S.date = v; }
 function clearDate() {
   S.date = '';
-  document.getElementById('date-display-label').textContent = '日付を選ぶ';
-  document.getElementById('date-display-label').style.color = '#8e8e93';
+  const el = document.getElementById('date-input-text');
+  if (el) el.value = '';
   document.getElementById('date-clear').style.display = 'none';
-  document.getElementById('date-input').value = '';
 }
 
 
