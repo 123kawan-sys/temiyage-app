@@ -829,7 +829,7 @@ function renderOrderSheet() {
 
     <div class="lbl" style="margin-bottom:6px">お渡し先の会社名</div>
     <input type="text" id="order-company" placeholder="例：丸紅不動産" value="${S.orderCompany||''}"
-      oninput="S.orderCompany=this.value;updateCompanySuggestions()"
+      oninput="S.orderCompany=this.value;updateOrderBtn()" onblur="updateCompanyList()"
       style="margin-bottom:6px;font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid #d1d1d6;width:100%">
     ${pastCompanies.length > 0 ? `
     <div style="margin-bottom:12px">
@@ -863,7 +863,23 @@ function selectCompany(c) {
 }
 
 function updateCompanySuggestions() {
-  renderOrderSheet();
+  // 入力中は再描画しない
+}
+function updateCompanyList() {
+  // フォーカスが外れたときだけ候補リストを更新
+  const el = document.getElementById('company-suggestions');
+  if (!el) return;
+  const q = S.orderCompany.toLowerCase();
+  const pastCompanies = [...new Set(S.historyData.map(h=>h.company))].filter(Boolean);
+  const filtered = q ? pastCompanies.filter(c=>c.includes(S.orderCompany)) : pastCompanies;
+  el.innerHTML = filtered.map(c=>`<div style="font-size:12px;padding:4px 10px;border-radius:14px;border:1px solid #d1d1d6;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('');
+}
+function updateOrderBtn() {
+  const btn = document.querySelector('.send-execute');
+  if (btn) {
+    btn.disabled = !S.orderCompany;
+    btn.style.opacity = S.orderCompany ? '1' : '0.35';
+  }
 }
 
 function selectOrderMethod(m) { S.orderMethod=m; renderOrderSheet(); }
