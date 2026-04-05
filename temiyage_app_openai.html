@@ -850,7 +850,7 @@ function renderOrderSheet() {
       ${S.delivery?`配送先：<span>${S.deliveryTo||'—'}</span>`:'持参'}
     </div>
 
-    <button class="send-execute" onclick="sendOrder()" ${!S.orderCompany?'disabled style="opacity:0.35"':''}>
+    <button class="send-execute" id="record-btn" onclick="sendOrder()" ${!S.orderCompany?'disabled style="opacity:0.35"':''}>
       履歴に記録する ↗
     </button>
     <button class="order-back" style="margin-top:8px;width:100%;padding:12px;font-size:14px;border-radius:14px;border:1px solid #d1d1d6;background:none;color:#8e8e93;cursor:pointer" onclick="document.getElementById('order-overlay').classList.remove('open')">戻る</button>
@@ -887,6 +887,8 @@ function selectOrderMethod(m) { S.orderMethod=m; renderOrderSheet(); }
 async function sendOrder() {
   const g = S.pickedGift;
   if (!S.orderCompany) return;
+  const btn = document.getElementById('record-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '記録中...'; }
 
   // 履歴データをローカルに追加
   const today = new Date();
