@@ -211,11 +211,7 @@ input[type=range] { width: 100%; accent-color: #1c1c1e; height: 4px; }
 
 <!-- 候補検索 -->
 <div id="page-search" class="page active">
-  <div class="api-section">
-    <div class="lbl">OpenAI APIキー</div>
-    <input type="password" id="api-key" placeholder="sk-..." />
-    <div class="api-note">このキーはブラウザ内のみで使用されます</div>
-  </div>
+
 
   <div class="section">
     <div class="lbl">発注者</div>
@@ -445,11 +441,7 @@ const S = {
 
 // ===== INIT =====
 window.onload = async () => {
-  const savedKey = localStorage.getItem('openai_api_key');
-  if (savedKey) document.getElementById('api-key').value = savedKey;
-  document.getElementById('api-key').addEventListener('input', function() {
-    if (this.value.startsWith('sk-')) localStorage.setItem('openai_api_key', this.value);
-  });
+
   renderDeptTabs();
   renderMemberChips();
   renderPurposeChips();
@@ -667,11 +659,6 @@ function expiryAlert(g) {
 }
 
 async function generateCandidates() {
-  const apiKey = document.getElementById('api-key').value.trim();
-  if (!apiKey) {
-    document.getElementById('result-area').innerHTML = '<div class="error-box">APIキーを入力してください。</div>';
-    return;
-  }
   const resultArea = document.getElementById('result-area');
   const btn = document.getElementById('go-btn');
   btn.disabled = true;
@@ -714,24 +701,9 @@ ${JSON.stringify(filtered.map(g=>({id:g.id,name:g.name,shop:g.shop,detail:g.deta
 [{"id":数値,"reason":"おすすめ理由（40字以内）","tag":"ラベル（定番/格上げ/季節感/話題性）"}]`;
 
   try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-        
-        
-        
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        
-        messages: [{ role: 'user', content: prompt }],
-          max_tokens: 500
-      })
-    });
+    const res = await fetch(SHEETS_URL + '?action=ai&prompt=' + encodeURIComponent(prompt));
     const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     const text = data.choices[0].message.content;
     const picks = JSON.parse(text.replace(/```json|```/g,'').trim());
     const results = picks.map(p => ({...S.gifts.find(g=>g.id==p.id), reason:p.reason, tag:p.tag})).filter(Boolean);
