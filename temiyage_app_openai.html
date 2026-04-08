@@ -368,17 +368,26 @@ input[type=range] { width: 100%; accent-color: #1c1c1e; height: 4px; }
       <div class="section">
         <div class="field-lbl" style="margin-bottom:10px">写真を登録（各1枚）</div>
         <div class="photo-area">
-          <div class="photo-slot" id="photo-slot-1" onclick="togglePhoto(1)">
-            <div class="photo-slot-icon">+</div>
-            <span>外観写真</span>
-          </div>
-          <div class="photo-slot" id="photo-slot-2" onclick="togglePhoto(2)">
-            <div class="photo-slot-icon">+</div>
-            <span>中身写真</span>
-          </div>
+          <label for="photo-input-1" style="cursor:pointer">
+            <div class="photo-slot" id="photo-slot-1">
+              <div class="photo-slot-icon" id="photo-icon-1">📷</div>
+              <span id="photo-label-1">外観写真を追加</span>
+            </div>
+          </label>
+          <input type="file" id="photo-input-1" accept="image/*" capture="environment"
+            style="display:none" onchange="handlePhoto(1, this)">
+
+          <label for="photo-input-2" style="cursor:pointer">
+            <div class="photo-slot" id="photo-slot-2">
+              <div class="photo-slot-icon" id="photo-icon-2">📷</div>
+              <span id="photo-label-2">中身写真を追加</span>
+            </div>
+          </label>
+          <input type="file" id="photo-input-2" accept="image/*" capture="environment"
+            style="display:none" onchange="handlePhoto(2, this)">
         </div>
         <div style="font-size:12px;color:#8e8e93;line-height:1.6;margin-bottom:16px">
-          カメラロールから選ぶか、その場で撮影できます。写真なしでも登録できます。
+          タップするとカメラまたはカメラロールが開きます。写真なしでも登録できます。
         </div>
       </div>
       <button class="save-btn" onclick="saveGift()">登録する</button>
@@ -1044,7 +1053,19 @@ function showAddStep1() {
   document.getElementById('add-step-done').style.display = 'none';
 }
 function showAddStep1Again() {
-  S.photo1=false; S.photo2=false; S.addPurposes=[]; S.addSeason=null;
+  S.photo1=null; S.photo2=null; S.addPurposes=[]; S.addSeason=null;
+  ['photo-slot-1','photo-slot-2'].forEach((id,i)=>{
+    const s=document.getElementById(id);
+    if(s){s.className='photo-slot';s.style.backgroundImage='';}
+  });
+  const ic1=document.getElementById('photo-icon-1');
+  const ic2=document.getElementById('photo-icon-2');
+  const lb1=document.getElementById('photo-label-1');
+  const lb2=document.getElementById('photo-label-2');
+  if(ic1)ic1.textContent='📷';
+  if(ic2)ic2.textContent='📷';
+  if(lb1)lb1.textContent='外観写真を追加';
+  if(lb2)lb2.textContent='中身写真を追加';
   document.getElementById('add-name').value='';
   document.getElementById('add-shop').value='';
   document.getElementById('add-loc').value='';
@@ -1060,16 +1081,25 @@ function showAddStep2() {
   document.getElementById('add-step-2').style.display = 'block';
   document.getElementById('add-step-done').style.display = 'none';
 }
-function togglePhoto(n) {
-  if (n===1) { S.photo1=!S.photo1; }
-  else { S.photo2=!S.photo2; }
-  const slot = document.getElementById(`photo-slot-${n}`);
-  const filled = n===1?S.photo1:S.photo2;
-  slot.className = 'photo-slot' + (filled?' filled':'');
-  slot.innerHTML = filled
-    ? '<div class="photo-slot-icon">✓</div><span>'+(n===1?'外観':'中身')+'　登録済み</span>'
-    : '<div class="photo-slot-icon">+</div><span>'+(n===1?'外観写真':'中身写真')+'</span>';
+function handlePhoto(n, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    if (n === 1) { S.photo1 = dataUrl; }
+    else { S.photo2 = dataUrl; }
+    const slot = document.getElementById(`photo-slot-${n}`);
+    slot.className = 'photo-slot filled';
+    slot.style.backgroundImage = `url(${dataUrl})`;
+    slot.style.backgroundSize = 'cover';
+    slot.style.backgroundPosition = 'center';
+    document.getElementById(`photo-icon-${n}`).textContent = '✓';
+    document.getElementById(`photo-label-${n}`).textContent = n===1?'外観写真　登録済み':'中身写真　登録済み';
+  };
+  reader.readAsDataURL(file);
 }
+function togglePhoto(n) {}
 function saveGift() {
   const newId = S.gifts.length ? Math.max(...S.gifts.map(g=>Number(g.id)||0))+1 : 1;
   S.gifts.push({
@@ -1085,7 +1115,7 @@ function saveGift() {
     cold: document.getElementById('add-cold').value === '要冷蔵',
     season: S.addSeason,
     expiry: document.getElementById('add-expiry').value ? Number(document.getElementById('add-expiry').value) : null,
-    photo1: null, photo2: null,
+    photo1: S.photo1||null, photo2: S.photo2||null,
   });
   document.getElementById('add-step-2').style.display = 'none';
   document.getElementById('add-step-done').style.display = 'block';
