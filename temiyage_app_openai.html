@@ -701,11 +701,10 @@ ${JSON.stringify(filtered.map(g=>({id:g.id,name:g.name,shop:g.shop,detail:g.deta
 [{"id":数値,"reason":"おすすめ理由（40字以内）","tag":"ラベル（定番/格上げ/季節感/話題性）"}]`;
 
   try {
-    const res = await fetch(SHEETS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'ai', prompt: prompt })
-    });
+    // プロンプトを短縮してGETで送信
+    const shortPrompt = prompt.substring(0, 2000);
+    const url = SHEETS_URL + '?action=ai&prompt=' + encodeURIComponent(shortPrompt);
+    const res = await fetch(url);
     const data = await res.json();
     if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     const text = data.choices[0].message.content;
