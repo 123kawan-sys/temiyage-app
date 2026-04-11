@@ -1084,6 +1084,26 @@ function saveGift() {
     expiry: document.getElementById('add-expiry').value ? Number(document.getElementById('add-expiry').value) : null,
     photo1: S.photo1||null, photo2: S.photo2||null,
   });
+  // スプレッドシートに書き込む
+  const row = [
+    newId,
+    document.getElementById('add-name').value || '新規商品',
+    document.getElementById('add-shop').value,
+    document.getElementById('add-loc').value,
+    document.getElementById('add-cat').value,
+    document.getElementById('add-price').value ? Number(document.getElementById('add-price').value.replace(/,/g,'')) : '',
+    '',
+    S.addPurposes.join(','),
+    document.getElementById('add-note').value,
+    document.getElementById('add-cold').value === '要冷蔵' ? '要冷蔵' : '',
+    S.addSeason || '',
+    document.getElementById('add-expiry').value || '',
+    '',
+    '',
+  ];
+  fetch(SHEETS_URL + '?action=addGift&data=' + encodeURIComponent(JSON.stringify(row)))
+    .catch(e => console.log('商品登録エラー:', e));
+
   document.getElementById('add-step-2').style.display = 'none';
   document.getElementById('add-step-done').style.display = 'block';
 }
