@@ -232,12 +232,6 @@ input[type=range] { width: 100%; accent-color: #1c1c1e; height: 4px; }
   </div>
 
   <div class="section">
-    <div class="lbl" id="headcount-label">訪問先の人数</div>
-    <div class="chips" id="headcount-chips"></div>
-    <div class="hint" id="headcount-hint"></div>
-  </div>
-
-  <div class="section">
     <div class="lbl">相手の所在地</div>
     <div class="chips" id="region-chips"></div>
   </div>
@@ -643,7 +637,7 @@ function selectDeliveryTo(v) {
 
 function updateGoBtn() {
   const btn = document.getElementById('go-btn');
-  const ok = S.person && S.purpose && S.role && S.headcount && S.region;
+  const ok = S.person && S.purpose && S.role && S.region;
   btn.disabled = !ok;
   btn.textContent = ok ? `${S.person}さんの候補を生成 ↗` : '条件をすべて選んでください';
 }
@@ -687,7 +681,6 @@ async function generateCandidates() {
 - 発注者：${S.person}（${S.dept}）
 - 訪問目的：${S.purpose}
 - 相手の役職：${S.role}
-- ${S.purpose==='会食'?'参加人数':'訪問先人数'}：${S.headcount}
 - 相手の所在地：${S.region}
 - 渡す日：${S.date||'未定'}${dl!==null?`（${dl}日後）`:''}
 - 予算レンジ：${S.budgetLabel==='指定なし'?'指定なし':'¥'+budgetMin.toLocaleString()+'〜¥'+budget.toLocaleString()}
@@ -829,7 +822,7 @@ function renderOrderSheet() {
       価格：<span>¥${g.price?g.price.toLocaleString():'要確認'}</span><br>
       発注者：<span>${S.person}（${S.dept}）</span><br>
       目的：<span>${S.purpose}</span><br>
-      人数：<span>${S.headcount}</span><br>
+
       渡す日：<span>${S.date||'未定'}</span><br>
       ${S.delivery?`配送先：<span>${S.deliveryTo||'—'}</span>`:'持参'}
     </div>
