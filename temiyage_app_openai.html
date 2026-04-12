@@ -886,6 +886,9 @@ function handlePhoto(n, input) {
 }
 
 async function saveGift() {
+  const btn = document.querySelector('#add-step-2 .save-btn');
+  if (btn) { btn.disabled=true; btn.textContent='登録中...'; }
+
   const newId = S.gifts.length ? Math.max(...S.gifts.map(g=>Number(g.id)||0))+1 : 1;
   const name = document.getElementById('add-name').value || '新規商品';
   const shop = document.getElementById('add-shop').value;
