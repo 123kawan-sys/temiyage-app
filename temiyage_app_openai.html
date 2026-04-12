@@ -282,14 +282,14 @@ input[type=text], input[type=date], select, textarea { width: 100%; font-size: 1
           <label for="photo-input-1" style="cursor:pointer">
             <div class="photo-slot" id="photo-slot-1">
               <div class="photo-slot-icon" id="photo-icon-1">📷</div>
-              <span id="photo-label-1">外観写真を追加</span>
+              <span id="photo-label-1">内観写真を追加</span>
             </div>
           </label>
           <input type="file" id="photo-input-1" accept="image/*" style="display:none" onchange="handlePhoto(1, this)">
           <label for="photo-input-2" style="cursor:pointer">
             <div class="photo-slot" id="photo-slot-2">
               <div class="photo-slot-icon" id="photo-icon-2">📷</div>
-              <span id="photo-label-2">中身写真を追加</span>
+              <span id="photo-label-2">外観写真を追加</span>
             </div>
           </label>
           <input type="file" id="photo-input-2" accept="image/*" style="display:none" onchange="handlePhoto(2, this)">
@@ -927,19 +927,11 @@ async function saveGift() {
     // まず商品データを登録
     await fetch(SHEETS_URL + '?action=addGift&data=' + encodeURIComponent(JSON.stringify(row)));
 
-    // 写真を別途アップロード（分割して送信）
+    // 写真を別途アップロード（内観のみ）
     if (S.photo1) {
-      const base64 = S.photo1.replace(/^data:image\/\w+;base64,/, '');
       const mimeType = S.photo1.match(/data:(image\/\w+);/)[1];
-      // 写真が大きい場合は圧縮して送信
       const compressed = await compressBase64(S.photo1);
       await fetch(SHEETS_URL + '?action=uploadPhoto&giftId=' + newId + '&photoType=内観&mimeType=' + encodeURIComponent(mimeType) + '&base64=' + encodeURIComponent(compressed));
-      S.gifts[S.gifts.length-1].photo1 = '読み込み中...';
-    }
-    if (S.photo2) {
-      const mimeType = S.photo2.match(/data:(image\/\w+);/)[1];
-      const compressed = await compressBase64(S.photo2);
-      await fetch(SHEETS_URL + '?action=uploadPhoto&giftId=' + newId + '&photoType=外観&mimeType=' + encodeURIComponent(mimeType) + '&base64=' + encodeURIComponent(compressed));
     }
   } catch(e) { console.log('商品登録エラー:', e); }
 
@@ -947,7 +939,7 @@ async function saveGift() {
   document.getElementById('add-step-done').style.display = 'block';
 }
 
-async function compressBase64(dataUrl, maxWidth=800, quality=0.7) {
+async function compressBase64(dataUrl, maxWidth=400, quality=0.5) {
   return new Promise(resolve => {
     const img = new Image();
     img.onload = () => {
