@@ -927,11 +927,21 @@ async function saveGift() {
     // まず商品データを登録
     await fetch(SHEETS_URL + '?action=addGift&data=' + encodeURIComponent(JSON.stringify(row)));
 
-    // 写真を別途アップロード（内観のみ）
+    // 写真を別途POSTでアップロード
     if (S.photo1) {
       const mimeType = S.photo1.match(/data:(image\/\w+);/)[1];
       const compressed = await compressBase64(S.photo1);
-      await fetch(SHEETS_URL + '?action=uploadPhoto&giftId=' + newId + '&photoType=内観&mimeType=' + encodeURIComponent(mimeType) + '&base64=' + encodeURIComponent(compressed));
+      await fetch(SHEETS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'uploadPhoto',
+          giftId: newId,
+          photoType: '内観',
+          base64: compressed,
+          mimeType: mimeType,
+        })
+      });
     }
   } catch(e) { console.log('商品登録エラー:', e); }
 
