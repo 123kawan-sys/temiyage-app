@@ -37,10 +37,8 @@ input[type=text], input[type=date], select, textarea { width: 100%; font-size: 1
 .result-header { font-size: 13px; font-weight: 600; color: #8e8e93; margin-bottom: 12px; }
 .gift-card { background: #fff; border-radius: 16px; border: 1px solid #e5e5ea; overflow: hidden; margin-bottom: 12px; cursor: pointer; transition: transform 0.1s; }
 .gift-card:active { transform: scale(0.98); }
-.gift-imgs { display: grid; grid-template-columns: 1fr 1fr; height: 100px; }
-.gift-img { background: #f2f2f7; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #8e8e93; border-right: 1px solid #e5e5ea; }
-.gift-img:last-child { border-right: none; }
-.gift-img img { width: 100%; height: 100%; object-fit: cover; }
+.gift-img-wrap { width: 100%; height: 140px; background: #f2f2f7; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #8e8e93; overflow: hidden; }
+.gift-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
 .gift-body { padding: 12px 14px; }
 .gift-name { font-size: 14px; font-weight: 700; color: #1c1c1e; margin-bottom: 3px; }
 .gift-shop { font-size: 12px; color: #8e8e93; margin-bottom: 6px; }
@@ -57,9 +55,8 @@ input[type=text], input[type=date], select, textarea { width: 100%; font-size: 1
 .modal-overlay.open { display: flex; }
 .modal { background: #fff; border-radius: 24px 24px 0 0; width: 100%; max-width: 480px; max-height: 88vh; overflow-y: auto; padding: 16px; }
 .modal-handle { width: 36px; height: 4px; background: #d1d1d6; border-radius: 2px; margin: 0 auto 14px; }
-.modal-imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-.modal-img { height: 110px; background: #f2f2f7; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #8e8e93; overflow: hidden; }
-.modal-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+.modal-img-wrap { width: 100%; height: 180px; background: #f2f2f7; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #8e8e93; overflow: hidden; margin-bottom: 14px; }
+.modal-img-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
 .modal-name { font-size: 18px; font-weight: 700; color: #1c1c1e; margin-bottom: 2px; }
 .modal-shop { font-size: 13px; color: #8e8e93; margin-bottom: 12px; }
 .modal-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid #f2f2f7; font-size: 13px; }
@@ -244,7 +241,6 @@ async function loadGiftsFromSheets() {
         season: row['季節限定'] || null,
         expiry: row['賞味期限（日数）'] ? Number(row['賞味期限（日数）']) : null,
         photo1: row['写真URL'] || null,
-        photo2: null,
       })).filter(g => g.name);
     }
   } catch(e) { console.log('シート読み込みエラー:', e); }
@@ -437,9 +433,8 @@ function renderResults(gifts) {
   gifts.forEach(g => {
     const al = expiryAlert(g);
     html += `<div class="gift-card" onclick="showModal(${JSON.stringify(g).replace(/"/g,'&quot;')})">
-      <div class="gift-imgs">
-        <div class="gift-img">${g.photo1?`<img src="${g.photo1}" onerror="this.parentNode.innerHTML='外観写真'">`:'外観写真'}</div>
-        <div class="gift-img">${g.photo2?`<img src="${g.photo2}" onerror="this.parentNode.innerHTML='中身写真'">`:'中身写真'}</div>
+      <div class="gift-img-wrap">
+        ${g.photo1 ? `<img src="${g.photo1}" onerror="this.parentNode.innerHTML='写真なし'">` : '写真なし'}
       </div>
       <div class="gift-body">
         <div class="gift-name">${g.name}</div>
@@ -467,9 +462,8 @@ function showModal(gStr) {
   const al = expiryAlert(g);
   document.getElementById('modal-content').innerHTML = `
     <div class="modal-handle"></div>
-    <div class="modal-imgs">
-      <div class="modal-img">${g.photo1?`<img src="${g.photo1}" onerror="this.parentNode.innerHTML='外観写真'">`:'外観写真'}</div>
-      <div class="modal-img">${g.photo2?`<img src="${g.photo2}" onerror="this.parentNode.innerHTML='中身写真'">`:'中身写真'}</div>
+    <div class="modal-img-wrap">
+      ${g.photo1 ? `<img src="${g.photo1}" onerror="this.parentNode.innerHTML='写真なし'">` : '写真なし'}
     </div>
     <div class="modal-name">${g.name}</div>
     <div class="modal-shop">${g.shop}（${g.loc}）</div>
