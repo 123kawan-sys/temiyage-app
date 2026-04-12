@@ -911,7 +911,20 @@ async function saveGift() {
   ];
 
   try {
-    await fetch(SHEETS_URL + '?action=addGift&data=' + encodeURIComponent(JSON.stringify(row)));
+    const res = await fetch(SHEETS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'addGift',
+        row: row,
+        photo1: S.photo1 || null,
+        photo2: S.photo2 || null,
+      })
+    });
+    const result = await res.json();
+    // DriveのURLをローカルのgiftsにも反映
+    if (result.photo1Url) S.gifts[S.gifts.length-1].photo1 = result.photo1Url;
+    if (result.photo2Url) S.gifts[S.gifts.length-1].photo2 = result.photo2Url;
   } catch(e) { console.log('商品登録エラー:', e); }
 
   document.getElementById('add-step-2').style.display = 'none';
