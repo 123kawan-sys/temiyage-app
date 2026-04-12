@@ -390,8 +390,8 @@ async function loadGiftsFromSheets() {
         cold: row['要冷蔵'] === '〇' || row['要冷蔵'] === '要冷蔵',
         season: row['季節限定'] || null,
         expiry: row['賞味期限（日数）'] ? Number(row['賞味期限（日数）']) : null,
-        photo1: row['写真URL（内観）'] || null,
-        photo2: row['写真URL（外観）'] || null,
+        photo1: row['写真URL'] || null,
+        photo2: null,
       })).filter(g => g.name);
       S.sheetsLoaded = true;
     }
@@ -917,10 +917,9 @@ async function saveGift() {
     cold ? '要冷蔵' : '',    // J: 要冷蔵
     S.addSeason||'',          // K: 季節限定
     expiry||'',               // L: 賞味期限（日数）
-    '',                       // M: 写真URL（内観）← Drive保存後に更新
-    '',                       // N: 写真URL（外観）← Drive保存後に更新
-    '',                       // O: 登録者
-    new Date().toLocaleDateString('ja-JP'), // P: 登録日
+    '',                       // M: 写真URL
+    '',                       // N: 登録者
+    new Date().toLocaleDateString('ja-JP'), // O: 登録日
   ];
 
   try {
