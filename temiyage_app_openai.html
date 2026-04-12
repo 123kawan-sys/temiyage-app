@@ -390,8 +390,8 @@ async function loadGiftsFromSheets() {
         cold: row['要冷蔵'] === '〇' || row['要冷蔵'] === '要冷蔵',
         season: row['季節限定'] || null,
         expiry: row['賞味期限（日数）'] ? Number(row['賞味期限（日数）']) : null,
-        photo1: row['写真URL（外観）'] || null,
-        photo2: row['写真URL（中身）'] || null,
+        photo1: row['写真URL（内観）'] || null,
+        photo2: row['写真URL（外観）'] || null,
       })).filter(g => g.name);
       S.sheetsLoaded = true;
     }
@@ -905,9 +905,22 @@ async function saveGift() {
   });
 
   const row = [
-    newId, name, shop, loc, cat, price||'', '',
-    S.addPurposes.join(','), note,
-    cold ? '要冷蔵' : '', S.addSeason||'', expiry||'', '', '',
+    newId,                    // A: ID
+    name,                     // B: 商品名
+    shop,                     // C: 店舗名
+    loc,                      // D: 購入場所
+    cat,                      // E: カテゴリ
+    price||'',                // F: 価格（税込）
+    '',                       // G: 内容・個数
+    S.addPurposes.join(','),  // H: 訪問目的
+    note,                     // I: 備考
+    cold ? '要冷蔵' : '',    // J: 要冷蔵
+    S.addSeason||'',          // K: 季節限定
+    expiry||'',               // L: 賞味期限（日数）
+    '',                       // M: 写真URL（内観）← Drive保存後に更新
+    '',                       // N: 写真URL（外観）← Drive保存後に更新
+    '',                       // O: 登録者
+    new Date().toLocaleDateString('ja-JP'), // P: 登録日
   ];
 
   try {
