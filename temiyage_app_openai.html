@@ -106,7 +106,6 @@ input[type=text], input[type=date], select, textarea { width: 100%; font-size: 1
   <button class="nav-btn" onclick="showPage('history')">履歴</button>
 </div>
 
-<!-- 候補検索 -->
 <div id="page-search" class="page active">
   <div class="section">
     <div class="lbl">発注者</div>
@@ -158,7 +157,6 @@ input[type=text], input[type=date], select, textarea { width: 100%; font-size: 1
   <div id="result-area" style="margin-top:20px"></div>
 </div>
 
-<!-- 履歴 -->
 <div id="page-history" class="page">
   <div class="search-box-wrap">
     <span class="search-icon">🔍</span>
@@ -168,12 +166,10 @@ input[type=text], input[type=date], select, textarea { width: 100%; font-size: 1
   <div id="history-content"></div>
 </div>
 
-<!-- 詳細モーダル -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
   <div class="modal" id="modal-content"></div>
 </div>
 
-<!-- 発注シート -->
 <div class="order-overlay" id="order-overlay" onclick="closeOrder(event)">
   <div class="order-sheet" id="order-content"></div>
 </div>
@@ -412,9 +408,11 @@ ${JSON.stringify(filtered.map(g=>({id:g.id,name:g.name,shop:g.shop,detail:g.deta
 [{"id":数値,"reason":"おすすめ理由（40字以内）","tag":"ラベル（定番/格上げ/季節感/話題性）"}]`;
 
   try {
-    const shortPrompt = prompt.substring(0, 2000);
-    const url = SHEETS_URL + '?action=ai&prompt=' + encodeURIComponent(shortPrompt);
-    const res = await fetch(url);
+    const res = await fetch(SHEETS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'ai', prompt: prompt })
+    });
     const data = await res.json();
     if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     const text = data.choices[0].message.content;
