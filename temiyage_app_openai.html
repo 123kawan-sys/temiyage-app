@@ -84,8 +84,6 @@ input[type=text], input[type=date], select, textarea { width: 100%; font-size: 1
 .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #8e8e93; font-size: 15px; }
 .filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
 .filter-row::-webkit-scrollbar { display: none; }
-.filter-chip { font-size: 12px; padding: 5px 12px; border-radius: 16px; border: 1px solid #d1d1d6; color: #8e8e93; background: #fff; cursor: pointer; white-space: nowrap; }
-.filter-chip.on { background: #1c1c1e; color: #fff; border-color: #1c1c1e; font-weight: 600; }
 .company-block { margin-bottom: 16px; }
 .company-hd { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 6px; border-bottom: 1px solid #e5e5ea; margin-bottom: 8px; }
 .company-name { font-size: 14px; font-weight: 700; }
@@ -99,36 +97,6 @@ input[type=text], input[type=date], select, textarea { width: 100%; font-size: 1
 .h-footer { display: flex; justify-content: space-between; align-items: center; }
 .h-person { font-size: 11px; color: #8e8e93; }
 .no-result { text-align: center; padding: 40px 0; font-size: 14px; color: #8e8e93; }
-.list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.list-count { font-size: 14px; font-weight: 700; }
-.add-new-btn { font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 20px; border: 1px solid #d1d1d6; background: #fff; color: #1c1c1e; cursor: pointer; }
-.gift-list-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f2f2f7; }
-.gift-list-item:last-child { border-bottom: none; }
-.gift-thumb { width: 44px; height: 44px; border-radius: 10px; background: #f2f2f7; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #8e8e93; }
-.gift-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.gift-info { flex: 1; min-width: 0; }
-.gift-list-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gift-list-sub { font-size: 11px; color: #8e8e93; margin-top: 2px; }
-.del-btn { font-size: 12px; padding: 5px 10px; border-radius: 8px; border: 1px solid #fde8e8; color: #c0392b; background: #fff; cursor: pointer; flex-shrink: 0; }
-.del-confirm { background: #fde8e8; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
-.del-confirm-txt { font-size: 13px; color: #c0392b; margin-bottom: 10px; line-height: 1.5; }
-.del-btns { display: flex; gap: 8px; }
-.del-btns button { flex: 1; padding: 8px; font-size: 13px; border-radius: 10px; cursor: pointer; }
-.del-yes { border: 1px solid #c0392b; background: none; color: #c0392b; font-weight: 600; }
-.del-no { border: 1px solid #d1d1d6; background: none; color: #8e8e93; }
-.cat-filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
-.cat-filter-row::-webkit-scrollbar { display: none; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-.form-row input, .form-row select { margin-bottom: 0; }
-.field-lbl { font-size: 11px; font-weight: 600; color: #8e8e93; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 5px; }
-.photo-area { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.photo-slot { height: 90px; border: 2px dashed #d1d1d6; border-radius: 14px; background: #f2f2f7; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; color: #8e8e93; gap: 5px; transition: all 0.15s; }
-.photo-slot.filled { border-style: solid; border-color: #1c1c1e; background: #fff; color: #1c1c1e; }
-.photo-slot-icon { font-size: 22px; }
-.save-btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 14px; border: none; background: #1c1c1e; color: #fff; cursor: pointer; margin-bottom: 10px; }
-.back-btn { width: 100%; padding: 12px; font-size: 14px; border-radius: 14px; border: 1px solid #d1d1d6; background: none; color: #8e8e93; cursor: pointer; }
-.success-wrap { text-align: center; padding: 50px 20px; }
-.success-icon { width: 60px; height: 60px; border-radius: 50%; background: #e8f5e9; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 28px; }
 </style>
 </head>
 <body>
@@ -139,7 +107,6 @@ input[type=text], input[type=date], select, textarea { width: 100%; font-size: 1
 <div class="nav">
   <button class="nav-btn active" onclick="showPage('search')">候補検索</button>
   <button class="nav-btn" onclick="showPage('history')">履歴</button>
-  <button class="nav-btn" onclick="showPage('adddelete')">追加・削除</button>
 </div>
 
 <!-- 候補検索 -->
@@ -204,96 +171,6 @@ input[type=text], input[type=date], select, textarea { width: 100%; font-size: 1
   <div id="history-content"></div>
 </div>
 
-<!-- 追加・削除 -->
-<div id="page-adddelete" class="page">
-  <div id="add-list-view">
-    <div class="list-header">
-      <span class="list-count" id="gift-count"></span>
-      <button class="add-new-btn" onclick="showAddForm()">＋ 新規追加</button>
-    </div>
-    <div class="search-box-wrap">
-      <span class="search-icon">🔍</span>
-      <input type="text" class="search-box" id="gift-search" placeholder="店舗名・商品名で検索" oninput="renderGiftList()">
-    </div>
-    <div class="cat-filter-row" id="cat-filters"></div>
-    <div id="del-confirm-area"></div>
-    <div id="gift-list"></div>
-  </div>
-
-  <div id="add-form-view" style="display:none">
-    <div id="add-step-1">
-      <div class="section">
-        <div class="field-lbl">商品名</div>
-        <input type="text" id="add-name" placeholder="例：焼菓子詰合せ A（12個入）">
-      </div>
-      <div class="form-row">
-        <div>
-          <div class="field-lbl">店舗名</div>
-          <input type="text" id="add-shop" placeholder="例：鈴懸">
-        </div>
-        <div>
-          <div class="field-lbl">購入場所</div>
-          <input type="text" id="add-loc" placeholder="例：岩田屋">
-        </div>
-      </div>
-      <div class="form-row">
-        <div>
-          <div class="field-lbl">カテゴリ</div>
-          <select id="add-cat">
-            <option>洋菓子</option><option>和菓子</option><option>チョコレート</option>
-            <option>カステラ</option><option>最中</option><option>食品</option>
-          </select>
-        </div>
-        <div>
-          <div class="field-lbl">価格（税込）</div>
-          <input type="text" id="add-price" placeholder="3,000">
-        </div>
-      </div>
-      <div class="form-row">
-        <div>
-          <div class="field-lbl">賞味期限（日数）</div>
-          <input type="text" id="add-expiry" placeholder="30">
-        </div>
-        <div>
-          <div class="field-lbl">要冷蔵</div>
-          <select id="add-cold"><option value="">不要</option><option value="要冷蔵">要冷蔵</option></select>
-        </div>
-      </div>
-      <div class="section">
-        <div class="field-lbl">季節限定</div>
-        <div class="chips" id="season-chips-add"></div>
-      </div>
-      <div class="section">
-        <div class="field-lbl">適した訪問目的（複数可）</div>
-        <div class="chips" id="purpose-chips-add"></div>
-      </div>
-      <div class="section">
-        <div class="field-lbl">備考</div>
-        <input type="text" id="add-note" placeholder="例：リボンラッピング無料">
-      </div>
-      <button class="save-btn" onclick="saveGift()">登録する</button>
-      <button class="back-btn" onclick="showListView()">一覧に戻る</button>
-    </div>
-
-    <div id="add-step-2" style="display:none">
-      <div class="section">
-        <div class="field-lbl" style="margin-bottom:10px">写真を登録（各1枚）</div>
-      <button class="save-btn" onclick="saveGift()">登録する</button>
-      <button class="back-btn" onclick="showAddStep1()">戻る</button>
-    </div>
-
-    <div id="add-step-done" style="display:none">
-      <div class="success-wrap">
-        <div class="success-icon">✓</div>
-        <div style="font-size:18px;font-weight:700;margin-bottom:8px">登録しました</div>
-        <div style="font-size:14px;color:#8e8e93;line-height:1.7">リストに追加されました。<br>次回から候補として表示されます。</div>
-        <button class="save-btn" style="margin-top:24px" onclick="showAddStep1Again()">続けて追加する</button>
-        <button class="back-btn" onclick="showListView()">一覧に戻る</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- 詳細モーダル -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
   <div class="modal" id="modal-content"></div>
@@ -316,10 +193,9 @@ const S = {
   dept:'BR', person:null, purpose:null, role:null, region:null,
   date:'', budgetMin:0, budgetMax:99999, budgetLabel:'指定なし',
   delivery:false, deliveryTo:'', deliveryAddr:'',
-  hFilter:'すべて', catFilter:'すべて', deleteTarget:null,
-  photo1:null, photo2:null, addPurposes:[], addSeason:null,
+  hFilter:'すべて',
   pickedGift:null, orderSent:false, orderCompany:'',
-  gifts:[], historyData:[], sheetsLoaded:false,
+  gifts:[], historyData:[],
 };
 
 window.onload = async () => {
@@ -330,9 +206,6 @@ window.onload = async () => {
   renderRegionChips();
   renderDeliveryChips();
   renderBudgetChips();
-  renderAddPurposeChips();
-  renderSeasonChipsAdd();
-  renderCatFilters();
   renderHistoryFilters();
   await loadGiftsFromSheets();
 };
@@ -373,21 +246,17 @@ async function loadGiftsFromSheets() {
         photo1: row['写真URL'] || null,
         photo2: null,
       })).filter(g => g.name);
-      S.sheetsLoaded = true;
     }
   } catch(e) { console.log('シート読み込みエラー:', e); }
-  renderGiftList();
-  renderGiftCount();
 }
 
 function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
-  const idx = {'search':0,'history':1,'adddelete':2}[page];
+  const idx = {'search':0,'history':1}[page];
   document.querySelectorAll('.nav-btn')[idx].classList.add('active');
   if (page === 'history') renderHistory();
-  if (page === 'adddelete') renderGiftList();
 }
 
 function renderDeptTabs() {
@@ -555,7 +424,6 @@ ${JSON.stringify(filtered.map(g=>({id:g.id,name:g.name,shop:g.shop,detail:g.deta
     const text = data.choices[0].message.content;
     const picks = JSON.parse(text.replace(/```json|```/g,'').trim());
     const results = picks.map(p => ({...S.gifts.find(g=>g.id==p.id), reason:p.reason, tag:p.tag})).filter(Boolean);
-    S.pickedResults = results;
     renderResults(results);
   } catch(e) {
     resultArea.innerHTML = `<div class="error-box">エラー：${e.message||'生成に失敗しました'}</div>`;
@@ -637,7 +505,7 @@ function renderOrderSheet() {
         <div class="sent-icon">✓</div>
         <div style="font-size:18px;font-weight:700;margin-bottom:8px">発注・履歴記録完了</div>
         <div style="font-size:14px;color:#8e8e93;line-height:1.7">グループLINEに通知しました。</div>
-        <button class="save-btn" style="margin-top:24px" onclick="document.getElementById('order-overlay').classList.remove('open');document.getElementById('modal-overlay').classList.remove('open')">閉じる</button>
+        <button class="send-execute" style="margin-top:24px" onclick="document.getElementById('order-overlay').classList.remove('open');document.getElementById('modal-overlay').classList.remove('open')">閉じる</button>
       </div>`;
     return;
   }
@@ -649,7 +517,7 @@ function renderOrderSheet() {
     <div class="lbl" style="margin-bottom:6px">お渡し先の会社名</div>
     <input type="text" id="order-company" placeholder="例：丸紅不動産" value="${S.orderCompany||''}"
       oninput="S.orderCompany=this.value;updateOrderBtn()" onblur="updateCompanyList()"
-      style="margin-bottom:6px;font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid #d1d1d6;width:100%">
+      style="margin-bottom:6px">
     ${pastCompanies.length > 0 ? `
     <div style="margin-bottom:12px">
       <div style="font-size:11px;color:#8e8e93;margin-bottom:5px">過去のお渡し先：</div>
@@ -657,7 +525,7 @@ function renderOrderSheet() {
         ${pastCompanies.map(c=>`<div style="font-size:12px;padding:4px 10px;border-radius:14px;border:1px solid #d1d1d6;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('')}
       </div>
     </div>` : ''}
-    <div class="order-summary" style="margin-bottom:12px">
+    <div class="order-summary">
       商品：<span>${g.name}</span><br>
       店舗：<span>${g.shop}（${g.loc}）</span><br>
       価格：<span>¥${g.price?g.price.toLocaleString():'要確認'}</span><br>
@@ -669,7 +537,7 @@ function renderOrderSheet() {
     <button class="send-execute" id="record-btn" onclick="sendOrder()" ${!S.orderCompany?'disabled style="opacity:0.35"':''}>
       発注し履歴に記録する ↗
     </button>
-    <button class="order-back" style="margin-top:8px;width:100%;padding:12px;font-size:14px;border-radius:14px;border:1px solid #d1d1d6;background:none;color:#8e8e93;cursor:pointer" onclick="document.getElementById('order-overlay').classList.remove('open')">戻る</button>
+    <button style="margin-top:8px;width:100%;padding:12px;font-size:14px;border-radius:14px;border:1px solid #d1d1d6;background:none;color:#8e8e93;cursor:pointer" onclick="document.getElementById('order-overlay').classList.remove('open')">戻る</button>
   `;
 }
 
@@ -759,196 +627,6 @@ function renderHistory() {
           </div>
         </div>`).join('')}
     </div>`).join('');
-}
-
-function renderCatFilters() {
-  const cats = ['すべて','洋菓子','和菓子','チョコレート','カステラ','最中','食品'];
-  const el = document.getElementById('cat-filters');
-  el.innerHTML = cats.map(c =>
-    `<div class="filter-chip ${S.catFilter===c?'on':''}" onclick="selectCatFilter('${c}')">${c}</div>`
-  ).join('');
-}
-function selectCatFilter(c) { S.catFilter=c; renderCatFilters(); renderGiftList(); }
-
-function renderGiftCount() {
-  const el = document.getElementById('gift-count');
-  if (el) el.textContent = `登録商品 ${S.gifts.length}件`;
-}
-
-function renderGiftList() {
-  const q = (document.getElementById('gift-search')?.value||'').trim();
-  let filtered = S.gifts;
-  if (q) filtered = filtered.filter(g=>g.shop.includes(q)||g.name.includes(q));
-  if (S.catFilter!=='すべて') filtered = filtered.filter(g=>g.cat===S.catFilter);
-  document.getElementById('gift-count').textContent = `登録商品 ${S.gifts.length}件`;
-  const delArea = document.getElementById('del-confirm-area');
-  if (S.deleteTarget!==null) {
-    const g = S.gifts.find(x=>x.id==S.deleteTarget);
-    delArea.innerHTML = g ? `
-      <div class="del-confirm">
-        <div class="del-confirm-txt">「${g.name}」を削除しますか？<br>この操作は取り消せません。</div>
-        <div class="del-btns">
-          <button class="del-yes" onclick="confirmDelete()">削除する</button>
-          <button class="del-no" onclick="S.deleteTarget=null;renderGiftList()">キャンセル</button>
-        </div>
-      </div>` : '';
-  } else { delArea.innerHTML = ''; }
-  const el = document.getElementById('gift-list');
-  if (!filtered.length) { el.innerHTML='<div class="no-result">該当する商品がありません</div>'; return; }
-  el.innerHTML = filtered.map(g=>`
-    <div class="gift-list-item">
-      <div class="gift-thumb">${g.photo1?`<img src="${g.photo1}" onerror="this.parentNode.innerHTML='写真'">`:'写真'}</div>
-      <div class="gift-info">
-        <div class="gift-list-name">${g.name}${g.season?`<span class="badge badge-season" style="margin-left:5px;font-size:10px">${g.season}</span>`:''}</div>
-        <div class="gift-list-sub">${g.shop}｜${g.cat}${g.price?'｜¥'+g.price.toLocaleString():''}</div>
-      </div>
-      <button class="del-btn" onclick="S.deleteTarget=${g.id};renderGiftList()">削除</button>
-    </div>`).join('');
-}
-
-function confirmDelete() {
-  S.gifts = S.gifts.filter(g=>g.id!=S.deleteTarget);
-  S.deleteTarget = null;
-  renderGiftList();
-}
-
-function showAddForm() {
-  document.getElementById('add-list-view').style.display = 'none';
-  document.getElementById('add-form-view').style.display = 'block';
-  showAddStep1();
-}
-function showListView() {
-  document.getElementById('add-list-view').style.display = 'block';
-  document.getElementById('add-form-view').style.display = 'none';
-  renderGiftList();
-}
-function showAddStep1() {
-  document.getElementById('add-step-1').style.display = 'block';
-  document.getElementById('add-step-2').style.display = 'none';
-  document.getElementById('add-step-done').style.display = 'none';
-}
-function showAddStep1Again() {
-  S.photo1=null; S.photo2=null; S.addPurposes=[]; S.addSeason=null;
-  ['photo-slot-1','photo-slot-2'].forEach(id=>{
-    const s=document.getElementById(id);
-    if(s){s.className='photo-slot';s.style.backgroundImage='';}
-  });
-  ['photo-icon-1','photo-icon-2'].forEach((id,i)=>{ const el=document.getElementById(id); if(el) el.textContent='📷'; });
-  document.getElementById('photo-label-1').textContent='外観写真を追加';
-  document.getElementById('photo-label-2').textContent='中身写真を追加';
-  ['add-name','add-shop','add-loc','add-price','add-expiry','add-note'].forEach(id=>{ document.getElementById(id).value=''; });
-  renderAddPurposeChips();
-  renderSeasonChipsAdd();
-  showAddStep1();
-}
-function showAddStep2() {
-  document.getElementById('add-step-1').style.display = 'none';
-  document.getElementById('add-step-2').style.display = 'block';
-  document.getElementById('add-step-done').style.display = 'none';
-}
-
-function handlePhoto(n, input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    if (n===1) S.photo1=dataUrl; else S.photo2=dataUrl;
-    const slot = document.getElementById(`photo-slot-${n}`);
-    slot.className='photo-slot filled';
-    slot.style.backgroundImage=`url(${dataUrl})`;
-    slot.style.backgroundSize='cover';
-    slot.style.backgroundPosition='center';
-    document.getElementById(`photo-icon-${n}`).textContent='✓';
-    document.getElementById(`photo-label-${n}`).textContent=n===1?'外観写真　登録済み':'中身写真　登録済み';
-  };
-  reader.readAsDataURL(file);
-}
-
-async function saveGift() {
-  const btn = document.querySelector('#add-step-2 .save-btn');
-  if (btn) { btn.disabled=true; btn.textContent='登録中...'; }
-
-  const newId = S.gifts.length ? Math.max(...S.gifts.map(g=>Number(g.id)||0))+1 : 1;
-  const name = document.getElementById('add-name').value || '新規商品';
-  const shop = document.getElementById('add-shop').value;
-  const loc = document.getElementById('add-loc').value;
-  const cat = document.getElementById('add-cat').value;
-  const priceRaw = document.getElementById('add-price').value;
-  const price = priceRaw ? Number(priceRaw.replace(/,/g,'')) : null;
-  const expiry = document.getElementById('add-expiry').value ? Number(document.getElementById('add-expiry').value) : null;
-  const note = document.getElementById('add-note').value;
-  const cold = document.getElementById('add-cold').value === '要冷蔵';
-
-  S.gifts.push({
-    id: newId, name, shop, loc, cat, price, detail: '',
-    purpose: [...S.addPurposes], note, cold,
-    season: S.addSeason, expiry,
-    photo1: S.photo1||null, photo2: S.photo2||null,
-  });
-
-  const row = [
-    newId,                    // A: ID
-    name,                     // B: 商品名
-    shop,                     // C: 店舗名
-    loc,                      // D: 購入場所
-    cat,                      // E: カテゴリ
-    price||'',                // F: 価格（税込）
-    '',                       // G: 内容・個数
-    S.addPurposes.join(','),  // H: 訪問目的
-    note,                     // I: 備考
-    cold ? '要冷蔵' : '',    // J: 要冷蔵
-    S.addSeason||'',          // K: 季節限定
-    expiry||'',               // L: 賞味期限（日数）
-    '',                       // M: 写真URL
-    '',                       // N: 登録者
-    new Date().toLocaleDateString('ja-JP'), // O: 登録日
-  ];
-
-  try {
-    await fetch(SHEETS_URL + '?action=addGift&data=' + encodeURIComponent(JSON.stringify(row)));
-  } catch(e) { console.log('商品登録エラー:', e); }
-
-  document.getElementById('add-step-1').style.display = 'none';
-  document.getElementById('add-step-done').style.display = 'block';
-}
-
-async function compressBase64(dataUrl, maxWidth=400, quality=0.5) {
-  return new Promise(resolve => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > maxWidth) { h = h * maxWidth / w; w = maxWidth; }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const compressed = canvas.toDataURL('image/jpeg', quality);
-      resolve(compressed.replace(/^data:image\/\w+;base64,/, ''));
-    };
-    img.src = dataUrl;
-  });
-}
-
-function renderAddPurposeChips() {
-  const el = document.getElementById('purpose-chips-add');
-  el.innerHTML = ['会食','訪問','御礼','謝罪'].map(v =>
-    `<div class="chip ${S.addPurposes.includes(v)?'on':''}" onclick="toggleAddPurpose('${v}')">${v}</div>`
-  ).join('');
-}
-function toggleAddPurpose(v) {
-  const i = S.addPurposes.indexOf(v);
-  if (i>=0) S.addPurposes.splice(i,1); else S.addPurposes.push(v);
-  renderAddPurposeChips();
-}
-function renderSeasonChipsAdd() {
-  const el = document.getElementById('season-chips-add');
-  el.innerHTML = ['なし','春限定','夏限定','秋限定','冬限定'].map(v =>
-    `<div class="chip ${(S.addSeason===v||(v==='なし'&&!S.addSeason))?'on':''}" onclick="selectSeason('${v}')">${v}</div>`
-  ).join('');
-}
-function selectSeason(v) {
-  S.addSeason = v==='なし' ? null : v;
-  renderSeasonChipsAdd();
 }
 </script>
 </body>
