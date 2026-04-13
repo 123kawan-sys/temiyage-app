@@ -301,10 +301,7 @@ async function submitForm() {
   document.getElementById('loading').style.display = 'block';
 
   try {
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'recommend', conditions: lastConditions }),
-    });
+    const res = await fetch(GAS_URL + '?action=recommend&data=' + encodeURIComponent(JSON.stringify(lastConditions)));
     const data = await res.json();
     document.getElementById('loading').style.display = 'none';
 
@@ -371,10 +368,8 @@ async function sendLine() {
   btn.disabled = true;
   btn.textContent = '送信中…';
   try {
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'saveRequest', conditions: lastConditions, shops: lastShops, requester: selectedMember }),
-    });
+    const payload = { conditions: lastConditions, shops: lastShops, requester: selectedMember };
+    const res = await fetch(GAS_URL + '?action=saveRequest&data=' + encodeURIComponent(JSON.stringify(payload)));
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
     btn.textContent = '送信済み　✓';
