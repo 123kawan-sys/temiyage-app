@@ -383,36 +383,22 @@ async function generateCandidates() {
   });
 
   const regionCtx = {
-    '福岡（地元）': '相手は福岡在住のため、定番品は避け特別感のある品・季節限定品を優先。',
-    '九州内': '相手は九州内（福岡以外）在住のため、福岡銘品で現地入手困難なものが喜ばれる。',
-    '県外': '相手は県外在住のため、福岡・九州らしさが伝わる名品を優先。',
+    '福岡（地元）': '相手は福岡在住のため定番品は避け特別感のある品を優先。',
+    '九州内': '相手は九州内在住のため福岡銘品で現地入手困難なものが喜ばれる。',
+    '県外': '相手は県外在住のため福岡らしさが伝わる名品を優先。',
   }[S.region] || '';
 
-  const prompt = `あなたは法人営業の手土産選定の専門家です。以下の条件と社内承認済みリストから最適な商品を3〜5点選んでください。
+  const giftList = filtered.map(g => ({
+    id: g.id, name: g.name, shop: g.shop,
+    price: g.price, cat: g.cat,
+    purpose: g.purpose, cold: g.cold,
+    expiry: g.expiry, season: g.season
+  }));
 
-【条件】
-- 発注者：${S.person}（${S.dept}）
-- 訪問目的：${S.purpose}
-- 相手の役職：${S.role}
-- 相手の所在地：${S.region}
-- 渡す日：${S.date||'未定'}${dl!==null?`（${dl}日後）`:''}
-- 予算レンジ：${S.budgetLabel==='指定なし'?'指定なし':'¥'+S.budgetMin.toLocaleString()+'〜¥'+S.budgetMax.toLocaleString()}
-- ${S.delivery?`配送先：${S.deliveryTo} ${document.getElementById('delivery-addr').value}`:'持参'}
-- 所在地方針：${regionCtx}
-- 商品名に個数が含まれる場合はそれを参考に、訪問規模に合った数量の商品を優先してください。
-
-【社内承認済みリスト】
-${JSON.stringify(filtered.map(g=>({id:g.id,name:g.name,shop:g.shop,detail:g.detail,price:g.price,cat:g.cat,purpose:g.purpose,cold:g.cold,expiry:g.expiry,season:g.season})))}
-
-以下のJSON形式のみで返答（他テキスト不要）：
-[{"id":数値,"reason":"おすすめ理由（40字以内）","tag":"ラベル（定番/格上げ/季節感/話題性）"}]`;
+  const prompt = `手土産選定。条件:発注者${S.person}(${S.dept}),目的${S.purpose},役職${S.role},所在地${S.region},日付${S.date||'未定'},予算${S.budgetLabel},${S.delivery?'配送:'+S.deliveryTo:'持参'},${regionCtx}。リスト:${JSON.stringify(giftList)}。最適3〜5点をJSON形式のみで返答:[{"id":数値,"reason":"理由40字以内","tag":"定番/格上げ/季節感/話題性"}]`;
 
   try {
-    const res = await fetch(SHEETS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'ai', prompt: prompt })
-    });
+    const res = await fetch(SHEETS_URL + '?action=ai&prompt=' + encodeURIComponent(prompt.substring(0, 1500)));
     const data = await res.json();
     if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     const text = data.choices[0].message.content;
