@@ -205,10 +205,10 @@ window.onload = async () => {
 
 async function loadGiftsFromSheets() {
   try {
-    const res = await fetch(SHEETS_URL);
+    const res = await fetch(SHEETS_URL, { redirect: 'follow' });
     const data = await res.json();
     try {
-      const hres = await fetch(SHEETS_URL + '?sheet=履歴');
+      const hres = await fetch(SHEETS_URL + '?sheet=履歴', { redirect: 'follow' });
       const hdata = await hres.json();
       if (Array.isArray(hdata)) {
         S.historyData = hdata.map(r => ({
@@ -398,11 +398,14 @@ async function generateCandidates() {
   const prompt = `手土産選定。条件:発注者${S.person}(${S.dept}),目的${S.purpose},役職${S.role},所在地${S.region},日付${S.date||'未定'},予算${S.budgetLabel},${S.delivery?'配送:'+S.deliveryTo:'持参'},${regionCtx}。リスト:${JSON.stringify(giftList)}。最適3〜5点をJSON形式のみで返答:[{"id":数値,"reason":"理由40字以内","tag":"定番/格上げ/季節感/話題性"}]`;
 
   try {
-    const res = await fetch(SHEETS_URL + '?action=ai&prompt=' + encodeURIComponent(prompt.substring(0, 1500)));
-    const data = await res.json();
+    const res = await fetch(SHEETS_URL + '?action=ai&prompt=' + encodeURIComponent(prompt.substring(0, 1500)), {
+      redirect: 'follow'
+    });
+    const text = await res.text();
+    const data = JSON.parse(text);
     if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-    const text = data.choices[0].message.content;
-    const picks = JSON.parse(text.replace(/```json|```/g,'').trim());
+    const content = data.choices[0].message.content;
+    const picks = JSON.parse(content.replace(/```json|```/g,'').trim());
     const results = picks.map(p => ({...S.gifts.find(g=>g.id==p.id), reason:p.reason, tag:p.tag})).filter(Boolean);
     renderResults(results);
   } catch(e) {
@@ -557,7 +560,9 @@ async function sendOrder() {
       S.delivery ? '配送' : '持参', S.deliveryTo||'',
       new Date().toLocaleDateString('ja-JP'),
     ];
-    await fetch(SHEETS_URL + '?action=addHistory&data=' + encodeURIComponent(JSON.stringify(row)));
+    await fetch(SHEETS_URL + '?action=addHistory&data=' + encodeURIComponent(JSON.stringify(row)), {
+      redirect: 'follow'
+    });
   } catch(e) { console.log('履歴書き込みエラー:', e); }
 
   S.orderSent = true;
