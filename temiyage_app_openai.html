@@ -94,9 +94,6 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
 .h-footer { display: flex; justify-content: space-between; align-items: center; }
 .h-person { font-size: 11px; color: #8e8e93; }
 .no-result { text-align: center; padding: 40px 0; font-size: 14px; color: #8e8e93; }
-.qty-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-.qty-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #d1d1d6; background: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-.qty-num { font-size: 20px; font-weight: 700; min-width: 32px; text-align: center; }
 </style>
 </head>
 <body>
@@ -181,7 +178,7 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxcEXLzjVzCymWNmBHxSsDPHBeloFqVpZMeQQwKe69YeBO5mkWiB4Mata5p_ppHvaZofQ/exec';
 
 const DEPTS = {
-  'BR': ['久積','河埜','宮原','廣野','佐藤','牧田','窪田','久保'],
+  'BR': ['久積','河埜','宮原','廣野','佐藤','牧田','窪田','久保','社長'],
   'PM': ['小島','森崎','中村聖','鳥海','矢島','奥村','宮園','下田','栗林','村田','空閑','中村美','萩原','西山','池田','藤田'],
 };
 
@@ -190,7 +187,7 @@ const S = {
   date:'', budgetMin:0, budgetMax:99999, budgetLabel:'指定なし',
   delivery:false, deliveryTo:'', deliveryAddr:'',
   hFilter:'すべて',
-  pickedGift:null, orderSent:false, orderCompany:'', orderQty:1,
+  pickedGift:null, orderSent:false, orderCompany:'',
   gifts:[], historyData:[],
 };
 
@@ -221,7 +218,6 @@ async function loadGiftsFromSheets() {
           detail: (r['店舗名']||'') + '｜' + (r['内容']||'') + '｜¥' + (r['価格']||''),
           person: r['発注者'] || '',
           purpose: r['目的'] || '',
-          qty: r['人数'] || '',
           delivery: r['持参配送'] === '配送',
         })).filter(r => r.company);
       }
@@ -400,7 +396,7 @@ async function generateCandidates() {
   }));
 
   const prompt = `手土産選定。条件:発注者${S.person}(${S.dept}),目的${S.purpose},役職${S.role},所在地${S.region},日付${S.date||'未定'},予算${S.budgetLabel},${S.delivery?'配送:'+S.deliveryTo:'持参'},${regionCtx}。リスト:${JSON.stringify(giftList)}。最適3〜5点をJSON形式のみで返答:[{"id":数値,"reason":"理由40字以内","tag":"定番/格上げ/季節感/話題性"}]【重要】予算レンジ外の商品は絶対に選ばないこと。reasonは商品名・店舗名・内容から読み取れる実際の特徴のみ書くこと。店舗の歴史・産地など確認できない情報は書かないこと`;
-  
+
   try {
     const res = await fetch(SHEETS_URL + '?action=ai&prompt=' + encodeURIComponent(prompt.substring(0, 1500)), {
       redirect: 'follow'
@@ -476,17 +472,10 @@ function closeModalDirect() { document.getElementById('modal-overlay').classList
 
 function showOrder() {
   S.orderSent = false;
-  S.orderQty = 1;
   renderOrderSheet();
   document.getElementById('order-overlay').classList.add('open');
 }
 function closeOrder(e) { if (e.target === document.getElementById('order-overlay')) document.getElementById('order-overlay').classList.remove('open'); }
-
-function changeQty(delta) {
-  S.orderQty = Math.max(1, S.orderQty + delta);
-  const el = document.getElementById('qty-display');
-  if (el) el.textContent = S.orderQty;
-}
 
 function renderOrderSheet() {
   const g = S.pickedGift;
@@ -505,7 +494,7 @@ function renderOrderSheet() {
   document.getElementById('order-content').innerHTML = `
     <div class="modal-handle"></div>
     <div class="order-title">手土産発注・履歴記録</div>
-    <div class="order-sub">お渡し先と個数を入力して記録してください</div>
+    <div class="order-sub">お渡し先を入力して記録してください</div>
     <div class="lbl" style="margin-bottom:6px">お渡し先の会社名</div>
     <input type="text" id="order-company" placeholder="例：丸紅不動産" value="${S.orderCompany||''}"
       oninput="S.orderCompany=this.value;updateOrderBtn()" onblur="updateCompanyList()"
@@ -517,18 +506,10 @@ function renderOrderSheet() {
         ${pastCompanies.map(c=>`<div style="font-size:12px;padding:4px 10px;border-radius:14px;border:1px solid #d1d1d6;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('')}
       </div>
     </div>` : ''}
-    <div class="lbl" style="margin-bottom:8px">個数</div>
-    <div class="qty-row" style="margin-bottom:14px">
-      <button class="qty-btn" onclick="changeQty(-1)">−</button>
-      <span class="qty-num" id="qty-display">${S.orderQty}</span>
-      <button class="qty-btn" onclick="changeQty(1)">＋</button>
-      <span style="font-size:13px;color:#8e8e93">個</span>
-    </div>
     <div class="order-summary">
       商品：<span>${g.name}</span><br>
       店舗：<span>${g.shop}（${g.loc}）</span><br>
       価格：<span>¥${g.price?g.price.toLocaleString():'要確認'}</span><br>
-      個数：<span id="summary-qty">${S.orderQty}個</span><br>
       発注者：<span>${S.person}（${S.dept}）</span><br>
       目的：<span>${S.purpose}</span><br>
       渡す日：<span>${S.date||'未定'}</span><br>
@@ -569,24 +550,22 @@ async function sendOrder() {
     detail: g.shop + '｜' + (g.detail||'') + '｜¥' + (g.price?g.price.toLocaleString():'要確認'),
     person: S.person,
     purpose: S.purpose,
-    qty: S.orderQty,
     delivery: S.delivery,
   });
 
   try {
     const row = [
-      S.orderCompany,           // A: お渡し先
-      g.name,                   // B: 商品名
-      g.shop,                   // C: 店舗名
-      g.detail||'',             // D: 内容
-      g.price||'',              // E: 価格
-      S.person + '（' + S.dept + '）', // F: 発注者
-      S.purpose,                // G: 目的
-      S.orderQty,               // H: 人数（個数）
-      S.date||'',               // I: 渡す日
-      S.delivery ? '配送' : '持参', // J: 持参配送
-      S.deliveryTo||'',         // K: 配送先
-      new Date().toLocaleDateString('ja-JP'), // L: 記録日
+      S.orderCompany,                          // A: お渡し先
+      g.name,                                  // B: 商品名
+      g.shop,                                  // C: 店舗名
+      g.detail||'',                            // D: 内容
+      g.price||'',                             // E: 価格
+      S.person + '（' + S.dept + '）',         // F: 発注者
+      S.purpose,                               // G: 目的
+      S.date||'',                              // H: 渡す日
+      S.delivery ? '配送' : '持参',            // I: 持参配送
+      S.deliveryTo||'',                        // J: 配送先
+      new Date().toLocaleDateString('ja-JP'),  // K: 記録日
     ];
     await fetch(SHEETS_URL + '?action=addHistory&data=' + encodeURIComponent(JSON.stringify(row)), {
       redirect: 'follow'
@@ -632,7 +611,6 @@ function renderHistory() {
               <span class="h-person">${h.person}</span>
               <div class="badges">
                 <span class="badge ${h.purpose==='謝罪'?'badge-warn':''}">${h.purpose}</span>
-                ${h.qty?`<span class="badge">${h.qty}個</span>`:''}
                 ${h.delivery?'<span class="badge">配送</span>':''}
               </div>
             </div>
