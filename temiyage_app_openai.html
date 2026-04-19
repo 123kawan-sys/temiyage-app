@@ -509,15 +509,11 @@ function renderOrderSheet() {
     <div class="order-sub">お渡し先を入力して記録してください</div>
     <div class="lbl" style="margin-bottom:6px">お渡し先の会社名</div>
     <input type="text" id="order-company" placeholder="例：丸紅不動産" value="${S.orderCompany||''}"
-      oninput="S.orderCompany=this.value;updateOrderBtn()" onblur="updateCompanyList()"
+      oninput="S.orderCompany=this.value;updateOrderBtn();updateCompanyList()"
       style="margin-bottom:6px">
-    ${pastCompanies.length > 0 ? `
-    <div style="margin-bottom:12px">
-      <div style="font-size:11px;color:#8e8e93;margin-bottom:5px">過去のお渡し先：</div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px" id="company-suggestions">
-        ${pastCompanies.map(c=>`<div style="font-size:12px;padding:4px 10px;border-radius:14px;border:1px solid #d1d1d6;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('')}
-      </div>
-    </div>` : ''}
+    <div id="company-suggestions-wrap" style="display:none;margin-bottom:12px">
+      <div style="display:flex;flex-direction:column;gap:3px" id="company-suggestions"></div>
+    </div>
     <div class="lbl" style="margin-bottom:8px">発注個数</div>
     <div class="qty-row">
       <button class="qty-btn" onclick="changeQty(-1)">−</button>
@@ -542,13 +538,18 @@ function renderOrderSheet() {
   `;
 }
 
-function selectCompany(c) { S.orderCompany=c; renderOrderSheet(); }
+function selectCompany(c) { S.orderCompany=c; document.getElementById('order-company').value=c; document.getElementById('company-suggestions').innerHTML=''; document.getElementById('company-suggestions-wrap').style.display='none'; updateOrderBtn(); }
 function updateCompanyList() {
   const el = document.getElementById('company-suggestions');
-  if (!el) return;
+  const wrap = document.getElementById('company-suggestions-wrap');
+  if (!el || !wrap) return;
+  const q = S.orderCompany.trim();
+  if (!q) { wrap.style.display='none'; el.innerHTML=''; return; }
   const pastCompanies = [...new Set(S.historyData.map(h=>h.company))].filter(Boolean);
-  const filtered = S.orderCompany ? pastCompanies.filter(c=>c.includes(S.orderCompany)) : pastCompanies;
-  el.innerHTML = filtered.map(c=>`<div style="font-size:12px;padding:4px 10px;border-radius:14px;border:1px solid #d1d1d6;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('');
+  const filtered = pastCompanies.filter(c=>c.includes(q));
+  if (!filtered.length) { wrap.style.display='none'; el.innerHTML=''; return; }
+  wrap.style.display='block';
+  el.innerHTML = filtered.map(c=>`<div style="font-size:13px;padding:8px 12px;border-radius:10px;border:1px solid #e5e5ea;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('');
 }
 function updateOrderBtn() {
   const btn = document.querySelector('.send-execute');
