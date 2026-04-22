@@ -396,10 +396,10 @@ async function generateCandidates() {
     cat: g.cat, purpose: g.purpose, cold: g.cold, season: g.season
   }));
 
-  const prompt = `手土産選定。条件:発注者${S.person}(${S.dept}),目的${S.purpose},役職${S.role},所在地${S.region},日付${S.date||'未定'},予算${S.budgetLabel},${S.delivery?'配送:'+S.deliveryTo:'持参'},${regionCtx}。リスト:${JSON.stringify(giftList)}。最適3〜5点をJSON形式のみで返答:[{"id":数値,"reason":"理由40字以内","tag":"定番/格上げ/季節感/話題性"}]【重要】予算レンジ外の商品は絶対に選ばないこと。reasonは商品名・店舗名・内容から読み取れる実際の特徴のみ書くこと。店舗の歴史・産地など確認できない情報は書かないこと`;
+  const prompt = `手土産選定。条件:${S.person}(${S.dept}),${S.purpose},${S.role},${S.region},予算${S.budgetLabel},${S.delivery?'配送:'+S.deliveryTo:'持参'}。リスト:${JSON.stringify(giftList)}。最適3〜5点をJSONのみで:[{"id":数値,"reason":"40字以内","tag":"定番/格上げ/季節感/話題性"}]予算外は選ばないこと`;
 
   try {
-    const res = await fetch(SHEETS_URL + '?action=ai&prompt=' + encodeURIComponent(prompt.substring(0, 2000)), {
+    const res = await fetch(SHEETS_URL + '?action=ai&prompt=' + encodeURIComponent(prompt.substring(0, 1000)), {
       redirect: 'follow'
     });
     const text = await res.text();
