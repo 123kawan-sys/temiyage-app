@@ -403,7 +403,7 @@ async function generateCandidates() {
   try {
     const res = await fetch(SHEETS_URL + '?action=ai', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ prompt: prompt }),
       redirect: 'follow'
     });
