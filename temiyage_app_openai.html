@@ -377,29 +377,15 @@ async function generateCandidates() {
   btn.textContent = '生成中...';
   resultArea.innerHTML = '<div class="loading"><div class="spinner"></div>AIが候補を選定しています...</div>';
 
-  const dl = daysLeft();
-  const filtered = S.gifts.filter(g => {
-    if (S.budgetLabel === '指定なし') return true;
-    if (g.price && g.price > S.budgetMax) return false;
-    if (S.budgetMin > 0 && g.price && g.price < S.budgetMin) return false;
-    return true;
-  });
-
-  const regionCtx = {
-    '福岡（地元）': '相手は福岡在住のため定番品は避け特別感のある品を優先。',
-    '九州内': '相手は九州内在住のため福岡銘品で現地入手困難なものが喜ばれる。',
-    '県外': '相手は県外在住のため福岡らしさが伝わる名品を優先。',
-  }[S.region] || '';
-
-  const giftList = filtered.map(g => ({
-    id: g.id, name: g.name, price: g.price,
-    cat: g.cat, purpose: g.purpose, cold: g.cold, season: g.season
-  }));
-
-  const prompt = `手土産選定。条件:${S.person}(${S.dept}),${S.purpose},${S.role},${S.region},予算${S.budgetLabel},${S.delivery?'配送:'+S.deliveryTo:'持参'}。リスト:${JSON.stringify(giftList)}。最適3〜5点をJSONのみで:[{"id":数値,"reason":"40字以内","tag":"定番/格上げ/季節感/話題性"}]予算外は選ばないこと`;
+  const params = {
+    person: S.person, dept: S.dept, purpose: S.purpose, role: S.role,
+    region: S.region, date: S.date, budgetLabel: S.budgetLabel,
+    budgetMin: S.budgetMin, budgetMax: S.budgetMax,
+    delivery: S.delivery, deliveryTo: S.deliveryTo
+  };
 
   try {
-    const res = await fetch(SHEETS_URL + '?action=ai&prompt=' + encodeURIComponent(prompt.substring(0, 1000)), {
+    const res = await fetch(SHEETS_URL + '?action=ai&params=' + encodeURIComponent(JSON.stringify(params)), {
       redirect: 'follow'
     });
     const text = await res.text();
