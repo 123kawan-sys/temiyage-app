@@ -1,1 +1,538 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>会食 お店選び</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      font-size: 15px; line-height: 1.6; background: #F7F6F3; color: #1a1a1a;
+      min-height: 100vh; padding: 20px 12px 60px;
+    }
+    .container { max-width: 600px; margin: 0 auto; width: 100%; }
+    h1 { font-size: 18px; font-weight: 600; letter-spacing: .02em; color: #1a1a1a; margin-bottom: 20px; }
+    h1 span { font-size: 12px; font-weight: 400; color: #888; margin-left: 8px; }
+    .card { background: #fff; border-radius: 14px; border: 1px solid #E8E6E1; padding: 16px; margin-bottom: 12px; }
+    .card-title { font-size: 11px; font-weight: 600; color: #888; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 14px; }
+    .field { margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+    label.field-label { display: block; font-size: 12px; color: #555; margin-bottom: 5px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    input[type="text"], input[type="number"], input[type="date"], input[type="time"], select, textarea {
+      width: 100%; font-size: 16px; font-family: inherit; padding: 10px 12px;
+      border: 1px solid #D8D6D1; border-radius: 8px; background: #FAFAF8; color: #1a1a1a;
+      appearance: none; -webkit-appearance: none; outline: none; transition: border-color .15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #1D9E75; }
+    textarea { resize: vertical; min-height: 64px; }
+    .chip-group { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip {
+      font-size: 13px; padding: 7px 13px; border-radius: 20px;
+      border: 1px solid #D8D6D1; background: #FAFAF8; color: #555;
+      cursor: pointer; user-select: none; transition: all .15s; -webkit-tap-highlight-color: transparent;
+    }
+    .chip.active { background: #E1F5EE; border-color: #1D9E75; color: #085041; font-weight: 500; }
+    .member-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .member-btn {
+      font-size: 13px; padding: 6px 12px; border-radius: 20px;
+      border: 1px solid #D8D6D1; background: #FAFAF8; color: #555; cursor: pointer; transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .member-btn.active { background: #E1F5EE; border-color: #1D9E75; color: #085041; font-weight: 500; }
+    .team-label { font-size: 11px; color: #aaa; font-weight: 600; letter-spacing: .06em; margin: 8px 0 5px; }
+    .team-label:first-child { margin-top: 0; }
+    .btn-primary {
+      width: 100%; padding: 14px; font-size: 16px; font-weight: 600; font-family: inherit;
+      border: none; border-radius: 10px; background: #1D9E75; color: #fff; cursor: pointer; transition: opacity .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-primary:hover { opacity: .88; }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    #loading { display: none; text-align: center; padding: 40px 0; color: #888; font-size: 14px; }
+    .spinner {
+      width: 28px; height: 28px; border: 3px solid #E8E6E1; border-top-color: #1D9E75;
+      border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #results { display: none; }
+    .results-header { font-size: 11px; font-weight: 600; color: #888; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+    .sort-hint { font-size: 12px; color: #aaa; margin-bottom: 12px; }
+    .result-card {
+      background: #fff; border-radius: 14px; border: 1px solid #E8E6E1;
+      margin-bottom: 10px; overflow: hidden; transition: box-shadow .2s;
+      cursor: grab;
+    }
+    .result-card.dragging { opacity: .4; box-shadow: 0 8px 24px rgba(0,0,0,.12); cursor: grabbing; }
+    .result-card.drag-over { border-color: #1D9E75; border-width: 2px; }
+    .shop-photo { width: 100%; height: 150px; object-fit: cover; display: block; }
+    .card-inner { padding: 14px 16px; }
+    .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px; }
+    .result-header-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+    .drag-handle { color: #ccc; font-size: 16px; flex-shrink: 0; line-height: 1; }
+    .shop-name { font-size: 16px; font-weight: 600; color: #1a1a1a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .result-header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .rank-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+    .rank-1 { background: #FFF8E1; color: #633806; border: 1px solid #EF9F27; }
+    .rank-2 { background: #F1EFE8; color: #444441; border: 1px solid #B4B2A9; }
+    .rank-3 { background: #F1EFE8; color: #444441; border: 1px solid #B4B2A9; }
+    .btn-exclude {
+      background: none; border: none; color: #ccc; font-size: 20px; cursor: pointer;
+      padding: 0 2px; line-height: 1; transition: color .15s; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-exclude:hover { color: #e53e3e; }
+    .shop-meta { font-size: 12px; color: #888; display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #F1EFE8; border: 1px solid #E0DDD7; color: #666; }
+    .tag-group { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .ai-reason { font-size: 13px; color: #444; line-height: 1.65; border-left: 3px solid #1D9E75; padding-left: 11px; margin: 10px 0; }
+    .caution { font-size: 12px; color: #B07D1A; background: #FFF8E1; border-radius: 6px; padding: 6px 10px; margin-top: 8px; }
+    .shop-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .btn-sub {
+      font-size: 13px; padding: 8px 14px; border-radius: 8px; border: 1px solid #D8D6D1;
+      background: #fff; color: #444; cursor: pointer; text-decoration: none; font-family: inherit;
+      transition: background .15s; -webkit-tap-highlight-color: transparent; white-space: nowrap;
+    }
+    .btn-sub:hover { background: #F7F6F3; }
+    .btn-sub.map { border-color: #1D9E75; color: #085041; background: #E1F5EE; }
+    .btn-line {
+      width: 100%; padding: 14px; font-size: 15px; font-weight: 600; font-family: inherit;
+      border-radius: 10px; border: 1px solid #D8D6D1; background: #fff; color: #444;
+      cursor: pointer; margin-top: 8px; transition: all .15s; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-line:hover { background: #F7F6F3; }
+    .btn-line.sent { background: #E1F5EE; border-color: #1D9E75; color: #085041; }
+    .btn-line:disabled { opacity: .6; cursor: not-allowed; }
+    #error-msg {
+      display: none; background: #FEF2F2; border: 1px solid #FCA5A5;
+      border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #991B1B; margin-bottom: 14px;
+    }
+    .btn-reset { display: block; text-align: center; font-size: 13px; color: #888; cursor: pointer; margin-top: 20px; text-decoration: underline; padding: 8px; }
+  </style>
+</head>
+<body>
+<div class="container">
 
+  <h1>会食 お店選び<span>法人営業部</span></h1>
+
+  <div id="form-section">
+
+    <div class="card">
+      <div class="card-title">担当者</div>
+      <div class="team-label">BR</div>
+      <div class="member-group">
+        <button class="member-btn" onclick="selectMember(this)">久積</button>
+        <button class="member-btn" onclick="selectMember(this)">河埜</button>
+        <button class="member-btn" onclick="selectMember(this)">宮原</button>
+        <button class="member-btn" onclick="selectMember(this)">廣野</button>
+        <button class="member-btn" onclick="selectMember(this)">佐藤</button>
+        <button class="member-btn" onclick="selectMember(this)">牧田</button>
+        <button class="member-btn" onclick="selectMember(this)">窪田</button>
+        <button class="member-btn" onclick="selectMember(this)">久保</button>
+      </div>
+      <div class="team-label">PM</div>
+      <div class="member-group">
+        <button class="member-btn" onclick="selectMember(this)">小島</button>
+        <button class="member-btn" onclick="selectMember(this)">森崎</button>
+        <button class="member-btn" onclick="selectMember(this)">中村聖</button>
+        <button class="member-btn" onclick="selectMember(this)">鳥海</button>
+        <button class="member-btn" onclick="selectMember(this)">矢島</button>
+        <button class="member-btn" onclick="selectMember(this)">奥村</button>
+        <button class="member-btn" onclick="selectMember(this)">宮園</button>
+        <button class="member-btn" onclick="selectMember(this)">下田</button>
+        <button class="member-btn" onclick="selectMember(this)">栗林</button>
+        <button class="member-btn" onclick="selectMember(this)">村田</button>
+        <button class="member-btn" onclick="selectMember(this)">空閑</button>
+        <button class="member-btn" onclick="selectMember(this)">中村美</button>
+        <button class="member-btn" onclick="selectMember(this)">萩原</button>
+        <button class="member-btn" onclick="selectMember(this)">西山</button>
+        <button class="member-btn" onclick="selectMember(this)">池田</button>
+        <button class="member-btn" onclick="selectMember(this)">藤田</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">基本情報</div>
+      <div class="field">
+        <label class="field-label">先方名称</label>
+        <input type="text" id="client-name" placeholder="例：福岡銀行天神支店">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label class="field-label">会食日</label>
+          <input type="date" id="date">
+        </div>
+        <div class="field">
+          <label class="field-label">時間</label>
+          <input type="time" id="time" value="19:00">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label class="field-label">人数</label>
+          <input type="number" id="headcount" min="1" max="100" placeholder="例：6">
+        </div>
+        <div class="field">
+          <label class="field-label">予算（/人）</label>
+          <select id="budget">
+            <option value="〜6,999円">〜6,999円</option>
+            <option value="7,000〜9,999円">7,000〜9,999円</option>
+            <option value="10,000〜14,999円">10,000〜14,999円</option>
+            <option value="15,000円〜">15,000円〜</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">エリア <span style="font-weight:400;text-transform:none;font-size:11px;color:#aaa;">複数選択可</span></div>
+      <div class="chip-group" id="area-group">
+        <span class="chip" data-val="博多">博多</span>
+        <span class="chip" data-val="中洲">中洲</span>
+        <span class="chip" data-val="春吉・渡辺通り">春吉・渡辺通り</span>
+        <span class="chip" data-val="西中洲">西中洲</span>
+        <span class="chip" data-val="天神・大名">天神・大名</span>
+        <span class="chip" data-val="今泉・警固・薬院">今泉・警固・薬院</span>
+        <span class="chip" data-val="赤坂">赤坂</span>
+        <span class="chip" data-val="その他">その他</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">ジャンル <span style="font-weight:400;text-transform:none;font-size:11px;color:#aaa;">複数選択可</span></div>
+      <div class="chip-group" id="genre-group">
+        <span class="chip" data-val="和食">和食</span>
+        <span class="chip" data-val="鮨">鮨</span>
+        <span class="chip" data-val="洋食">洋食</span>
+        <span class="chip" data-val="中華">中華</span>
+        <span class="chip" data-val="焼肉">焼肉</span>
+        <span class="chip" data-val="その他">その他</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">用途・相手先・部屋タイプ</div>
+      <div class="field">
+        <label class="field-label">用途</label>
+        <select id="usage">
+          <option value="商談">商談</option>
+          <option value="懇親">懇親</option>
+          <option value="接待（格式高め）">接待（格式高め）</option>
+          <option value="カジュアル">カジュアル</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">相手先</label>
+        <div class="chip-group" id="client-group">
+          <span class="chip" data-val="福岡">福岡</span>
+          <span class="chip" data-val="九州">九州（福岡除く）</span>
+          <span class="chip" data-val="それ以外">それ以外</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">部屋タイプ <span style="font-size:11px;color:#aaa;">複数選択可</span></label>
+        <div class="chip-group" id="room-group">
+          <span class="chip" data-val="個室">個室</span>
+          <span class="chip" data-val="テーブル">テーブル</span>
+          <span class="chip" data-val="カウンター">カウンター</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">備考</div>
+      <textarea id="note" placeholder="アレルギー、禁酒の方がいる、駐車場希望など"></textarea>
+    </div>
+
+    <div id="error-msg"></div>
+    <button class="btn-primary" id="submit-btn" onclick="submitForm()">お店を提案してもらう</button>
+  </div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>条件に合うお店を探しています…</p>
+  </div>
+
+  <div id="results">
+    <div class="results-header">AI提案結果</div>
+    <div class="sort-hint">⠿ 長押しでドラッグして順番を変更 ／ ✕ で候補を除外</div>
+    <div id="result-cards"></div>
+    <button class="btn-line" id="line-btn" onclick="sendLine()">LINE で予約リクエストを送信する</button>
+    <span class="btn-reset" onclick="resetForm()">条件を変えて再検索する</span>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyrE-D2R1qvrNieyENWjWmHznwb_41Lvzdq-NiS7_n88Hn1OXho3tzTTA_tlrA-yGLS/exec';
+
+let lastShops = [];
+let lastConditions = {};
+let selectedMember = '';
+
+function selectMember(btn) {
+  document.querySelectorAll('.member-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  selectedMember = btn.textContent;
+}
+
+document.querySelectorAll('.chip').forEach(function(chip) {
+  chip.addEventListener('click', function() { chip.classList.toggle('active'); });
+});
+
+function getChipValues(groupId) {
+  return Array.from(document.querySelectorAll('#' + groupId + ' .chip.active')).map(function(c) { return c.dataset.val; });
+}
+
+function validate() {
+  if (!selectedMember) return '担当者を選択してください。';
+  if (!document.getElementById('client-name').value.trim()) return '先方名称を入力してください。';
+  if (!document.getElementById('date').value) return '会食日を入力してください。';
+  const headcount = document.getElementById('headcount').value;
+  if (!headcount || Number(headcount) < 1) return '人数を入力してください。';
+  if (getChipValues('area-group').length === 0) return 'エリアを1つ以上選択してください。';
+  if (getChipValues('room-group').length === 0) return '部屋タイプを1つ以上選択してください。';
+  if (getChipValues('client-group').length === 0) return '相手先を選択してください。';
+  return null;
+}
+
+async function submitForm() {
+  const errMsg = validate();
+  const errEl = document.getElementById('error-msg');
+  if (errMsg) { errEl.textContent = errMsg; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+
+  const date = document.getElementById('date').value;
+  const time = document.getElementById('time').value;
+  const dateLabel = date ? new Date(date).toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'short' }) : '';
+
+  lastConditions = {
+    clientName: document.getElementById('client-name').value.trim(),
+    datetime:   dateLabel + ' ' + time,
+    headcount:  document.getElementById('headcount').value,
+    budget:     document.getElementById('budget').value,
+    areas:      getChipValues('area-group'),
+    genres:     getChipValues('genre-group'),
+    usage:      document.getElementById('usage').value,
+    roomTypes:  getChipValues('room-group'),
+    clientArea: getChipValues('client-group')[0] || '',
+    note:       document.getElementById('note').value.trim(),
+  };
+
+  document.getElementById('form-section').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+
+  try {
+    const res = await fetch(GAS_URL + '?action=recommend&data=' + encodeURIComponent(JSON.stringify(lastConditions)));
+    const data = await res.json();
+    document.getElementById('loading').style.display = 'none';
+
+    if (!data.ok) throw new Error(data.error || 'エラーが発生しました。');
+
+    if (!data.shops || data.shops.length === 0) {
+      document.getElementById('form-section').style.display = 'block';
+      errEl.textContent = data.message || '条件に合うお店が見つかりませんでした。条件を広げてお試しください。';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    lastShops = data.shops;
+    renderResults(data.shops);
+    document.getElementById('results').style.display = 'block';
+
+  } catch (err) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('form-section').style.display = 'block';
+    errEl.textContent = 'エラーが発生しました：' + err.message;
+    errEl.style.display = 'block';
+  }
+}
+
+function renderResults(shops) {
+  const rankClass  = ['rank-1', 'rank-2', 'rank-3'];
+  const rankLabels = ['1位', '2位', '3位'];
+  const container  = document.getElementById('result-cards');
+  container.innerHTML = '';
+
+  shops.forEach(function(shop, i) {
+    const budgetText = (shop.budgetMin && shop.budgetMax)
+      ? Number(shop.budgetMin).toLocaleString() + '〜' + Number(shop.budgetMax).toLocaleString() + '円/人' : '';
+    const mapBtn = shop.mapUrl
+      ? '<a class="btn-sub map" href="' + shop.mapUrl + '" target="_blank" rel="noopener">Googleマップ</a>' : '';
+    const webBtn = shop.webUrl
+      ? '<a class="btn-sub" href="' + shop.webUrl + '" target="_blank" rel="noopener">ネット予約</a>' : '';
+    const cautionHtml = shop.caution ? '<div class="caution">⚠ ' + shop.caution + '</div>' : '';
+    const usageTags = shop.usageTags
+      ? shop.usageTags.split(',').map(function(t) { return '<span class="tag">' + t.trim() + '</span>'; }).join('') : '';
+    const photoHtml = shop.photoUrl
+      ? '<img class="shop-photo" src="' + shop.photoUrl + '" alt="' + shop.name + '" onerror="this.style.display=\'none\'">' : '';
+
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.dataset.index = i;
+    card.draggable = true;
+    card.innerHTML =
+      photoHtml +
+      '<div class="card-inner">' +
+        '<div class="result-header">' +
+          '<div class="result-header-left">' +
+            '<span class="drag-handle">⠿</span>' +
+            '<span class="shop-name">' + shop.name + '</span>' +
+          '</div>' +
+          '<div class="result-header-right">' +
+            '<span class="rank-badge ' + rankClass[i] + '">' + rankLabels[i] + '</span>' +
+            '<button class="btn-exclude" onclick="excludeCard(this)" title="除外">✕</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="shop-meta"><span>' + shop.area + '</span><span>' + shop.genre + '</span><span>' + shop.roomTypes + '</span><span>' + budgetText + '</span></div>' +
+        '<div class="tag-group">' + usageTags + '</div>' +
+        '<div class="ai-reason">' + shop.reason + '</div>' +
+        cautionHtml +
+        '<div class="shop-actions">' + mapBtn +
+          (shop.phone ? '<button class="btn-sub" onclick="callTel(\'' + shop.phone + '\')">電話：' + shop.phone + '</button>' : '') +
+          webBtn +
+        '</div>' +
+      '</div>';
+
+    container.appendChild(card);
+  });
+
+  initDragAndDrop();
+}
+
+function excludeCard(btn) {
+  const card = btn.closest('.result-card');
+  card.style.transition = 'opacity .3s';
+  card.style.opacity = '0';
+  setTimeout(function() {
+    card.remove();
+    updateRankBadges();
+  }, 300);
+}
+
+function updateRankBadges() {
+  const rankClass  = ['rank-1', 'rank-2', 'rank-3'];
+  const rankLabels = ['1位', '2位', '3位'];
+  const cards = document.querySelectorAll('#result-cards .result-card');
+  cards.forEach(function(card, i) {
+    const badge = card.querySelector('.rank-badge');
+    if (badge && i < 3) {
+      badge.className = 'rank-badge ' + rankClass[i];
+      badge.textContent = rankLabels[i];
+    }
+  });
+}
+
+function initDragAndDrop() {
+  const container = document.getElementById('result-cards');
+  let dragEl = null;
+  let touchStartY = 0;
+  let touchEl = null;
+
+  container.addEventListener('dragstart', function(e) {
+    dragEl = e.target.closest('.result-card');
+    if (!dragEl) return;
+    setTimeout(function() { dragEl.classList.add('dragging'); }, 0);
+  });
+  container.addEventListener('dragend', function() {
+    if (dragEl) dragEl.classList.remove('dragging');
+    document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
+    updateRankBadges();
+    dragEl = null;
+  });
+  container.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    const target = e.target.closest('.result-card');
+    if (!target || target === dragEl) return;
+    document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
+    target.classList.add('drag-over');
+    const rect = target.getBoundingClientRect();
+    const mid = rect.top + rect.height / 2;
+    if (e.clientY < mid) {
+      container.insertBefore(dragEl, target);
+    } else {
+      container.insertBefore(dragEl, target.nextSibling);
+    }
+  });
+
+  container.addEventListener('touchstart', function(e) {
+    touchEl = e.target.closest('.result-card');
+    if (!touchEl) return;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  container.addEventListener('touchmove', function(e) {
+    if (!touchEl) return;
+    e.preventDefault();
+    const touchY = e.touches[0].clientY;
+    touchEl.classList.add('dragging');
+    const elements = document.elementsFromPoint(e.touches[0].clientX, touchY);
+    const target = elements.find(function(el) {
+      return el.classList && el.classList.contains('result-card') && el !== touchEl;
+    });
+    if (target) {
+      document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
+      target.classList.add('drag-over');
+      const rect = target.getBoundingClientRect();
+      if (touchY < rect.top + rect.height / 2) {
+        container.insertBefore(touchEl, target);
+      } else {
+        container.insertBefore(touchEl, target.nextSibling);
+      }
+    }
+  }, { passive: false });
+
+  container.addEventListener('touchend', function() {
+    if (touchEl) {
+      touchEl.classList.remove('dragging');
+      document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
+      updateRankBadges();
+    }
+    touchEl = null;
+  });
+}
+
+function callTel(phone) {
+  if (phone) window.location.href = 'tel:' + phone.replace(/-/g, '');
+}
+
+async function sendLine() {
+  const btn = document.getElementById('line-btn');
+  btn.disabled = true;
+  btn.textContent = '送信中…';
+
+  const cards = document.querySelectorAll('#result-cards .result-card');
+  const currentShops = [];
+  cards.forEach(function(card) {
+    const idx = parseInt(card.dataset.index);
+    if (!isNaN(idx) && lastShops[idx]) currentShops.push(lastShops[idx]);
+  });
+
+  try {
+    const payload = { conditions: lastConditions, shops: currentShops, requester: selectedMember };
+    const res = await fetch(GAS_URL + '?action=saveRequest&data=' + encodeURIComponent(JSON.stringify(payload)));
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    btn.textContent = '送信済み　✓';
+    btn.classList.add('sent');
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'LINE で予約リクエストを送信する';
+    alert('送信に失敗しました：' + err.message);
+  }
+}
+
+function resetForm() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('result-cards').innerHTML = '';
+  document.getElementById('line-btn').disabled = false;
+  document.getElementById('line-btn').textContent = 'LINE で予約リクエストを送信する';
+  document.getElementById('line-btn').classList.remove('sent');
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('form-section').style.display = 'block';
+  document.querySelectorAll('.member-btn').forEach(function(b) { b.classList.remove('active'); });
+  selectedMember = '';
+}
+</script>
+</body>
+</html>
