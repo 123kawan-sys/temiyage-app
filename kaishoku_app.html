@@ -338,6 +338,8 @@ function renderResults(shops) {
     const mapBtn = shop.mapUrl
       ? '<a class="btn-sub map" href="' + shop.mapUrl + '" target="_blank" rel="noopener">Googleマップ</a>' : '';
     const cautionHtml = shop.caution ? '<div class="caution">⚠ ' + shop.caution + '</div>' : '';
+    const webBtn = shop.webUrl
+      ? '<a class="btn-sub" href="' + shop.webUrl + '" target="_blank" rel="noopener">ネット予約</a>' : '';
     const usageTags = shop.usageTags
       ? shop.usageTags.split(',').map(function(t) { return '<span class="tag">' + t.trim() + '</span>'; }).join('') : '';
 
@@ -352,8 +354,8 @@ function renderResults(shops) {
         '<div class="ai-reason">' + shop.reason + '</div>' +
         cautionHtml +
         '<div class="shop-actions">' + mapBtn +
-          '<button class="btn-sub" onclick="callTel(\'' + shop.phone + '\')">電話：' + shop.phone + '</button>' +
-          '<span class="btn-sub">予約：' + shop.reservation + '</span>' +
+     　 '<button class="btn-sub" onclick="callTel(\'' + shop.phone + '\')">電話：' + shop.phone + '</button>' +
+          webBtn +
         '</div>' +
       '</div>';
   });
