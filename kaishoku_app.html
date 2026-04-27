@@ -509,7 +509,10 @@ async function sendLine() {
   });
 
   try {
-    const payload = { conditions: lastConditions, shops: currentShops, requester: selectedMember };
+  const slimShops = currentShops.map(function(s) {
+    return { name: s.name, area: s.area, genre: s.genre, phone: s.phone, webUrl: s.webUrl };
+  });
+  const payload = { conditions: lastConditions, shops: slimShops, requester: selectedMember };
     const res = await fetch(GAS_URL + '?action=saveRequest&data=' + encodeURIComponent(JSON.stringify(payload)));
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
