@@ -2,26 +2,26 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>会食 お店選び</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
       font-size: 15px; line-height: 1.6; background: #F7F6F3; color: #1a1a1a;
-      min-height: 100vh; padding: 24px 16px 60px;
+      min-height: 100vh; padding: 20px 12px 60px;
     }
-    .container { max-width: 600px; margin: 0 auto; }
+    .container { max-width: 600px; margin: 0 auto; width: 100%; }
     h1 { font-size: 18px; font-weight: 600; letter-spacing: .02em; color: #1a1a1a; margin-bottom: 20px; }
     h1 span { font-size: 12px; font-weight: 400; color: #888; margin-left: 8px; }
-    .card { background: #fff; border-radius: 14px; border: 1px solid #E8E6E1; padding: 20px; margin-bottom: 14px; }
+    .card { background: #fff; border-radius: 14px; border: 1px solid #E8E6E1; padding: 16px; margin-bottom: 12px; }
     .card-title { font-size: 11px; font-weight: 600; color: #888; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 14px; }
     .field { margin-bottom: 14px; }
     .field:last-child { margin-bottom: 0; }
     label.field-label { display: block; font-size: 12px; color: #555; margin-bottom: 5px; }
-    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     input[type="text"], input[type="number"], input[type="date"], input[type="time"], select, textarea {
-      width: 100%; font-size: 14px; font-family: inherit; padding: 9px 12px;
+      width: 100%; font-size: 16px; font-family: inherit; padding: 10px 12px;
       border: 1px solid #D8D6D1; border-radius: 8px; background: #FAFAF8; color: #1a1a1a;
       appearance: none; -webkit-appearance: none; outline: none; transition: border-color .15s;
     }
@@ -29,55 +29,80 @@
     textarea { resize: vertical; min-height: 64px; }
     .chip-group { display: flex; flex-wrap: wrap; gap: 7px; }
     .chip {
-      font-size: 13px; padding: 6px 13px; border-radius: 20px;
+      font-size: 13px; padding: 7px 13px; border-radius: 20px;
       border: 1px solid #D8D6D1; background: #FAFAF8; color: #555;
-      cursor: pointer; user-select: none; transition: all .15s;
+      cursor: pointer; user-select: none; transition: all .15s; -webkit-tap-highlight-color: transparent;
     }
     .chip.active { background: #E1F5EE; border-color: #1D9E75; color: #085041; font-weight: 500; }
     .member-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
     .member-btn {
-      font-size: 13px; padding: 5px 12px; border-radius: 20px;
+      font-size: 13px; padding: 6px 12px; border-radius: 20px;
       border: 1px solid #D8D6D1; background: #FAFAF8; color: #555; cursor: pointer; transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
     }
     .member-btn.active { background: #E1F5EE; border-color: #1D9E75; color: #085041; font-weight: 500; }
     .team-label { font-size: 11px; color: #aaa; font-weight: 600; letter-spacing: .06em; margin: 8px 0 5px; }
     .team-label:first-child { margin-top: 0; }
     .btn-primary {
-      width: 100%; padding: 13px; font-size: 15px; font-weight: 600; font-family: inherit;
+      width: 100%; padding: 14px; font-size: 16px; font-weight: 600; font-family: inherit;
       border: none; border-radius: 10px; background: #1D9E75; color: #fff; cursor: pointer; transition: opacity .15s;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn-primary:hover { opacity: .88; }
     .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
-    #loading { display: none; text-align: center; padding: 32px 0; color: #888; font-size: 14px; }
+    #loading { display: none; text-align: center; padding: 40px 0; color: #888; font-size: 14px; }
     .spinner {
       width: 28px; height: 28px; border: 3px solid #E8E6E1; border-top-color: #1D9E75;
       border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     #results { display: none; }
-    .result-card { background: #fff; border-radius: 14px; border: 1px solid #E8E6E1; padding: 18px 20px; margin-bottom: 12px; }
-    .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-    .shop-name { font-size: 17px; font-weight: 600; color: #1a1a1a; }
+    .results-header { font-size: 11px; font-weight: 600; color: #888; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+    .sort-hint { font-size: 12px; color: #aaa; margin-bottom: 12px; }
+
+    /* 結果カード */
+    .result-card {
+      background: #fff; border-radius: 14px; border: 1px solid #E8E6E1;
+      margin-bottom: 10px; overflow: hidden; transition: box-shadow .2s;
+      cursor: grab;
+    }
+    .result-card.dragging { opacity: .4; box-shadow: 0 8px 24px rgba(0,0,0,.12); cursor: grabbing; }
+    .result-card.drag-over { border-color: #1D9E75; border-width: 2px; }
+
+    .shop-photo { width: 100%; height: 150px; object-fit: cover; display: block; }
+    .card-inner { padding: 14px 16px; }
+    .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px; }
+    .result-header-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+    .drag-handle { color: #ccc; font-size: 16px; flex-shrink: 0; line-height: 1; }
+    .shop-name { font-size: 16px; font-weight: 600; color: #1a1a1a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .result-header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .rank-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
     .rank-1 { background: #FFF8E1; color: #633806; border: 1px solid #EF9F27; }
     .rank-2 { background: #F1EFE8; color: #444441; border: 1px solid #B4B2A9; }
     .rank-3 { background: #F1EFE8; color: #444441; border: 1px solid #B4B2A9; }
-    .shop-meta { font-size: 12px; color: #888; display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .btn-exclude {
+      background: none; border: none; color: #ccc; font-size: 20px; cursor: pointer;
+      padding: 0 2px; line-height: 1; transition: color .15s; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-exclude:hover { color: #e53e3e; }
+
+    .shop-meta { font-size: 12px; color: #888; display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
     .tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #F1EFE8; border: 1px solid #E0DDD7; color: #666; }
     .tag-group { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
     .ai-reason { font-size: 13px; color: #444; line-height: 1.65; border-left: 3px solid #1D9E75; padding-left: 11px; margin: 10px 0; }
     .caution { font-size: 12px; color: #B07D1A; background: #FFF8E1; border-radius: 6px; padding: 6px 10px; margin-top: 8px; }
     .shop-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .btn-sub {
-      font-size: 12px; padding: 6px 13px; border-radius: 8px; border: 1px solid #D8D6D1;
-      background: #fff; color: #444; cursor: pointer; text-decoration: none; font-family: inherit; transition: background .15s;
+      font-size: 13px; padding: 8px 14px; border-radius: 8px; border: 1px solid #D8D6D1;
+      background: #fff; color: #444; cursor: pointer; text-decoration: none; font-family: inherit;
+      transition: background .15s; -webkit-tap-highlight-color: transparent; white-space: nowrap;
     }
     .btn-sub:hover { background: #F7F6F3; }
     .btn-sub.map { border-color: #1D9E75; color: #085041; background: #E1F5EE; }
     .btn-line {
-      width: 100%; padding: 13px; font-size: 14px; font-weight: 600; font-family: inherit;
+      width: 100%; padding: 14px; font-size: 15px; font-weight: 600; font-family: inherit;
       border-radius: 10px; border: 1px solid #D8D6D1; background: #fff; color: #444;
-      cursor: pointer; margin-top: 4px; transition: all .15s;
+      cursor: pointer; margin-top: 8px; transition: all .15s; -webkit-tap-highlight-color: transparent;
     }
     .btn-line:hover { background: #F7F6F3; }
     .btn-line.sent { background: #E1F5EE; border-color: #1D9E75; color: #085041; }
@@ -86,7 +111,7 @@
       display: none; background: #FEF2F2; border: 1px solid #FCA5A5;
       border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #991B1B; margin-bottom: 14px;
     }
-    .btn-reset { display: block; text-align: center; font-size: 13px; color: #888; cursor: pointer; margin-top: 20px; text-decoration: underline; }
+    .btn-reset { display: block; text-align: center; font-size: 13px; color: #888; cursor: pointer; margin-top: 20px; text-decoration: underline; padding: 8px; }
   </style>
 </head>
 <body>
@@ -134,7 +159,7 @@
       <div class="card-title">基本情報</div>
       <div class="field">
         <label class="field-label">先方名称</label>
-        <input type="text" id="client-name" placeholder="例：福岡銀行天神支店、三菱地所福岡支店">
+        <input type="text" id="client-name" placeholder="例：福岡銀行天神支店">
       </div>
       <div class="row2">
         <div class="field">
@@ -233,7 +258,8 @@
   </div>
 
   <div id="results">
-    <div style="font-size:11px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;">AI提案結果</div>
+    <div class="results-header">AI提案結果</div>
+    <div class="sort-hint">⠿ 長押しでドラッグして順番を変更 ／ ✕ で候補を除外</div>
     <div id="result-cards"></div>
     <button class="btn-line" id="line-btn" onclick="sendLine()">LINE で予約リクエストを送信する</button>
     <span class="btn-reset" onclick="resetForm()">条件を変えて再検索する</span>
@@ -337,27 +363,141 @@ function renderResults(shops) {
       ? Number(shop.budgetMin).toLocaleString() + '〜' + Number(shop.budgetMax).toLocaleString() + '円/人' : '';
     const mapBtn = shop.mapUrl
       ? '<a class="btn-sub map" href="' + shop.mapUrl + '" target="_blank" rel="noopener">Googleマップ</a>' : '';
-    const cautionHtml = shop.caution ? '<div class="caution">⚠ ' + shop.caution + '</div>' : '';
     const webBtn = shop.webUrl
       ? '<a class="btn-sub" href="' + shop.webUrl + '" target="_blank" rel="noopener">ネット予約</a>' : '';
+    const cautionHtml = shop.caution ? '<div class="caution">⚠ ' + shop.caution + '</div>' : '';
     const usageTags = shop.usageTags
       ? shop.usageTags.split(',').map(function(t) { return '<span class="tag">' + t.trim() + '</span>'; }).join('') : '';
+    const photoHtml = shop.photoUrl
+      ? '<img class="shop-photo" src="' + shop.photoUrl + '" alt="' + shop.name + '" onerror="this.style.display=\'none\'">' : '';
 
-    container.innerHTML +=
-      '<div class="result-card">' +
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.dataset.index = i;
+    card.draggable = true;
+    card.innerHTML =
+      photoHtml +
+      '<div class="card-inner">' +
         '<div class="result-header">' +
-          '<span class="shop-name">' + shop.name + '</span>' +
-          '<span class="rank-badge ' + rankClass[i] + '">' + rankLabels[i] + '</span>' +
+          '<div class="result-header-left">' +
+            '<span class="drag-handle">⠿</span>' +
+            '<span class="shop-name">' + shop.name + '</span>' +
+          '</div>' +
+          '<div class="result-header-right">' +
+            '<span class="rank-badge ' + rankClass[i] + '">' + rankLabels[i] + '</span>' +
+            '<button class="btn-exclude" onclick="excludeCard(this)" title="除外">✕</button>' +
+          '</div>' +
         '</div>' +
         '<div class="shop-meta"><span>' + shop.area + '</span><span>' + shop.genre + '</span><span>' + shop.roomTypes + '</span><span>' + budgetText + '</span></div>' +
         '<div class="tag-group">' + usageTags + '</div>' +
         '<div class="ai-reason">' + shop.reason + '</div>' +
         cautionHtml +
         '<div class="shop-actions">' + mapBtn +
-     　 '<button class="btn-sub" onclick="callTel(\'' + shop.phone + '\')">電話：' + shop.phone + '</button>' +
+          (shop.phone ? '<button class="btn-sub" onclick="callTel(\'' + shop.phone + '\')">電話：' + shop.phone + '</button>' : '') +
           webBtn +
         '</div>' +
       '</div>';
+
+    container.appendChild(card);
+  });
+
+  initDragAndDrop();
+}
+
+// 除外
+function excludeCard(btn) {
+  const card = btn.closest('.result-card');
+  card.style.transition = 'opacity .3s';
+  card.style.opacity = '0';
+  setTimeout(function() {
+    card.remove();
+    updateRankBadges();
+  }, 300);
+}
+
+// ランクバッジ更新
+function updateRankBadges() {
+  const rankClass  = ['rank-1', 'rank-2', 'rank-3'];
+  const rankLabels = ['1位', '2位', '3位'];
+  const cards = document.querySelectorAll('#result-cards .result-card');
+  cards.forEach(function(card, i) {
+    const badge = card.querySelector('.rank-badge');
+    if (badge && i < 3) {
+      badge.className = 'rank-badge ' + rankClass[i];
+      badge.textContent = rankLabels[i];
+    }
+  });
+}
+
+// ドラッグ＆ドロップ（PC + タッチ）
+function initDragAndDrop() {
+  const container = document.getElementById('result-cards');
+  let dragEl = null;
+  let touchStartY = 0;
+  let touchEl = null;
+
+  // PC ドラッグ
+  container.addEventListener('dragstart', function(e) {
+    dragEl = e.target.closest('.result-card');
+    if (!dragEl) return;
+    setTimeout(function() { dragEl.classList.add('dragging'); }, 0);
+  });
+  container.addEventListener('dragend', function() {
+    if (dragEl) dragEl.classList.remove('dragging');
+    document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
+    updateRankBadges();
+    dragEl = null;
+  });
+  container.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    const target = e.target.closest('.result-card');
+    if (!target || target === dragEl) return;
+    document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
+    target.classList.add('drag-over');
+    const rect = target.getBoundingClientRect();
+    const mid = rect.top + rect.height / 2;
+    if (e.clientY < mid) {
+      container.insertBefore(dragEl, target);
+    } else {
+      container.insertBefore(dragEl, target.nextSibling);
+    }
+  });
+
+  // タッチ（スマホ）
+  container.addEventListener('touchstart', function(e) {
+    touchEl = e.target.closest('.result-card');
+    if (!touchEl) return;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  container.addEventListener('touchmove', function(e) {
+    if (!touchEl) return;
+    e.preventDefault();
+    const touchY = e.touches[0].clientY;
+    touchEl.classList.add('dragging');
+    const elements = document.elementsFromPoint(e.touches[0].clientX, touchY);
+    const target = elements.find(function(el) {
+      return el.classList && el.classList.contains('result-card') && el !== touchEl;
+    });
+    if (target) {
+      document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
+      target.classList.add('drag-over');
+      const rect = target.getBoundingClientRect();
+      if (touchY < rect.top + rect.height / 2) {
+        container.insertBefore(touchEl, target);
+      } else {
+        container.insertBefore(touchEl, target.nextSibling);
+      }
+    }
+  }, { passive: false });
+
+  container.addEventListener('touchend', function() {
+    if (touchEl) {
+      touchEl.classList.remove('dragging');
+      document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
+      updateRankBadges();
+    }
+    touchEl = null;
   });
 }
 
@@ -365,12 +505,22 @@ function callTel(phone) {
   if (phone) window.location.href = 'tel:' + phone.replace(/-/g, '');
 }
 
+// LINE送信（現在の表示順・除外後の店舗で送信）
 async function sendLine() {
   const btn = document.getElementById('line-btn');
   btn.disabled = true;
   btn.textContent = '送信中…';
+
+  // 現在表示されているカードの順でshopsを構成
+  const cards = document.querySelectorAll('#result-cards .result-card');
+  const currentShops = [];
+  cards.forEach(function(card) {
+    const idx = parseInt(card.dataset.index);
+    if (!isNaN(idx) && lastShops[idx]) currentShops.push(lastShops[idx]);
+  });
+
   try {
-    const payload = { conditions: lastConditions, shops: lastShops, requester: selectedMember };
+    const payload = { conditions: lastConditions, shops: currentShops, requester: selectedMember };
     const res = await fetch(GAS_URL + '?action=saveRequest&data=' + encodeURIComponent(JSON.stringify(payload)));
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
