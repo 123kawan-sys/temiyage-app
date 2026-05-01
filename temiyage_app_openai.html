@@ -6,7 +6,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="手土産アプリ">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>手土産アプリ</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -78,10 +77,12 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
 .sent-wrap { text-align: center; padding: 30px 16px; }
 .sent-icon { width: 56px; height: 56px; border-radius: 50%; background: #e8f5e9; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 26px; }
 .search-box-wrap { position: relative; margin-bottom: 10px; }
-.search-box { width: 100%; font-size: 14px; padding: 10px 12px; border-radius: 12px; border: 1px solid #d1d1d6; background: #f2f2f7; color: #1c1c1e; }
-.search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #8e8e93; pointer-events: none; }
-.filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+.search-box { width: 100%; font-size: 14px; padding: 10px 12px 10px 36px; border-radius: 12px; border: 1px solid #d1d1d6; background: #f2f2f7; color: #1c1c1e; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #8e8e93; font-size: 15px; }
+.filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; flex-wrap: nowrap; }
 .filter-row::-webkit-scrollbar { display: none; }
+.filter-chip { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid #d1d1d6; color: #8e8e93; background: #fff; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.filter-chip.on { background: #1c1c1e; color: #fff; border-color: #1c1c1e; }
 .company-block { margin-bottom: 16px; }
 .company-hd { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 6px; border-bottom: 1px solid #e5e5ea; margin-bottom: 8px; }
 .company-name { font-size: 14px; font-weight: 700; }
@@ -95,9 +96,6 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
 .h-footer { display: flex; justify-content: space-between; align-items: center; }
 .h-person { font-size: 11px; color: #8e8e93; }
 .no-result { text-align: center; padding: 40px 0; font-size: 14px; color: #8e8e93; }
-.qty-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-.qty-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #d1d1d6; background: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-.qty-num { font-size: 20px; font-weight: 700; min-width: 32px; text-align: center; }
 </style>
 </head>
 <body>
@@ -163,7 +161,8 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
 
 <div id="page-history" class="page">
   <div class="search-box-wrap">
-    <input type="text" class="search-box" id="history-search" placeholder="🔍 社名・商品名・担当者で検索" oninput="renderHistory()">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-box" id="history-search" placeholder="社名・商品名・担当者で検索" oninput="renderHistory()">
   </div>
   <div class="filter-row" id="history-filters"></div>
   <div id="history-content"></div>
@@ -190,7 +189,7 @@ const S = {
   date:'', budgetMin:0, budgetMax:99999, budgetLabel:'指定なし',
   delivery:false, deliveryTo:'', deliveryAddr:'',
   hFilter:'すべて',
-  pickedGift:null, orderSent:false, orderCompany:'', orderQty:1,
+  pickedGift:null, orderSent:false, orderCompany:'',
   gifts:[], historyData:[],
 };
 
@@ -216,7 +215,13 @@ async function loadGiftsFromSheets() {
       if (Array.isArray(hdata)) {
         S.historyData = hdata.map(r => ({
           company: r['お渡し先'] || '',
-          date: r['日付'] || r['渡す日'] || '',
+          date: (function(d) {
+            if (!d) return '';
+            if (d instanceof Date) return (d.getMonth()+1) + '/' + d.getDate();
+            var s = String(d);
+            if (s.includes('T')) { var dt = new Date(s); return (dt.getMonth()+1) + '/' + dt.getDate(); }
+            return s;
+          })(r['日付'] || r['渡す日']),
           name: r['商品名'] || '',
           detail: (r['店舗名']||'') + '｜' + (r['内容']||'') + '｜¥' + (r['価格']||''),
           person: r['発注者'] || '',
@@ -377,21 +382,36 @@ async function generateCandidates() {
   btn.textContent = '生成中...';
   resultArea.innerHTML = '<div class="loading"><div class="spinner"></div>AIが候補を選定しています...</div>';
 
-  const params = {
-    person: S.person, dept: S.dept, purpose: S.purpose, role: S.role,
-    region: S.region, date: S.date, budgetLabel: S.budgetLabel,
-    budgetMin: S.budgetMin, budgetMax: S.budgetMax,
-    delivery: S.delivery, deliveryTo: S.deliveryTo
-  };
+  const dl = daysLeft();
+  const filtered = S.gifts.filter(g => {
+    if (S.budgetLabel === '指定なし') return true;
+    if (g.price && g.price > S.budgetMax) return false;
+    if (S.budgetMin > 0 && g.price && g.price < S.budgetMin) return false;
+    return true;
+  });
+
+  const regionCtx = {
+    '福岡（地元）': '相手は福岡在住のため定番品は避け特別感のある品を優先。',
+    '九州内': '相手は九州内在住のため福岡銘品で現地入手困難なものが喜ばれる。',
+    '県外': '相手は県外在住のため福岡らしさが伝わる名品を優先。',
+  }[S.region] || '';
+
+  const giftList = filtered.map(g => ({
+    id: g.id, name: g.name, shop: g.shop,
+    price: g.price, cat: g.cat,
+    purpose: g.purpose, cold: g.cold,
+    expiry: g.expiry, season: g.season
+  }));
+
+  const prompt = `手土産選定。条件:発注者${S.person}(${S.dept}),目的${S.purpose},役職${S.role},所在地${S.region},日付${S.date||'未定'},予算${S.budgetLabel},${S.delivery?'配送:'+S.deliveryTo:'持参'},${regionCtx}。リスト:${JSON.stringify(giftList)}。最適3〜5点をJSON形式のみで返答:[{"id":数値,"reason":"理由40字以内","tag":"定番/格上げ/季節感/話題性"}]【重要】予算レンジ外の商品は絶対に選ばないこと。reasonは商品名・店舗名・内容から読み取れる実際の特徴のみ書くこと。店舗の歴史・産地など確認できない情報は書かないこと`;
 
   try {
-    const res = await fetch(SHEETS_URL + '?action=ai&params=' + encodeURIComponent(JSON.stringify(params)), {
+    const res = await fetch(SHEETS_URL + '?action=ai&prompt=' + encodeURIComponent(prompt.substring(0, 1500)), {
       redirect: 'follow'
     });
     const text = await res.text();
     const data = JSON.parse(text);
     if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-    if (!data.choices || !data.choices[0]) throw new Error('AIからの応答が不正です。もう一度お試しください。');
     const content = data.choices[0].message.content;
     const picks = JSON.parse(content.replace(/```json|```/g,'').trim());
     const results = picks.map(p => ({...S.gifts.find(g=>g.id==p.id), reason:p.reason, tag:p.tag})).filter(Boolean);
@@ -460,19 +480,10 @@ function closeModalDirect() { document.getElementById('modal-overlay').classList
 
 function showOrder() {
   S.orderSent = false;
-  S.orderQty = 1;
   renderOrderSheet();
   document.getElementById('order-overlay').classList.add('open');
 }
 function closeOrder(e) { if (e.target === document.getElementById('order-overlay')) document.getElementById('order-overlay').classList.remove('open'); }
-
-function changeQty(delta) {
-  S.orderQty = Math.max(1, S.orderQty + delta);
-  const el = document.getElementById('qty-display');
-  if (el) el.textContent = S.orderQty;
-  const sq = document.getElementById('summary-qty');
-  if (sq) sq.textContent = S.orderQty + '個';
-}
 
 function renderOrderSheet() {
   const g = S.pickedGift;
@@ -494,23 +505,19 @@ function renderOrderSheet() {
     <div class="order-sub">お渡し先を入力して記録してください</div>
     <div class="lbl" style="margin-bottom:6px">お渡し先の会社名</div>
     <input type="text" id="order-company" placeholder="例：丸紅不動産" value="${S.orderCompany||''}"
-      oninput="S.orderCompany=this.value;updateOrderBtn();updateCompanyList()"
+      oninput="S.orderCompany=this.value;updateOrderBtn()" onblur="updateCompanyList()"
       style="margin-bottom:6px">
-    <div id="company-suggestions-wrap" style="display:none;margin-bottom:12px">
-      <div style="display:flex;flex-direction:column;gap:3px" id="company-suggestions"></div>
-    </div>
-    <div class="lbl" style="margin-bottom:8px">発注個数</div>
-    <div class="qty-row">
-      <button class="qty-btn" onclick="changeQty(-1)">−</button>
-      <span class="qty-num" id="qty-display">${S.orderQty}</span>
-      <button class="qty-btn" onclick="changeQty(1)">＋</button>
-      <span style="font-size:13px;color:#8e8e93">個</span>
-    </div>
+    ${pastCompanies.length > 0 ? `
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:#8e8e93;margin-bottom:5px">過去のお渡し先：</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px" id="company-suggestions">
+        ${pastCompanies.map(c=>`<div style="font-size:12px;padding:4px 10px;border-radius:14px;border:1px solid #d1d1d6;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('')}
+      </div>
+    </div>` : ''}
     <div class="order-summary">
       商品：<span>${g.name}</span><br>
       店舗：<span>${g.shop}（${g.loc}）</span><br>
       価格：<span>¥${g.price?g.price.toLocaleString():'要確認'}</span><br>
-      個数：<span id="summary-qty">${S.orderQty}個</span><br>
       発注者：<span>${S.person}（${S.dept}）</span><br>
       目的：<span>${S.purpose}</span><br>
       渡す日：<span>${S.date||'未定'}</span><br>
@@ -523,18 +530,13 @@ function renderOrderSheet() {
   `;
 }
 
-function selectCompany(c) { S.orderCompany=c; document.getElementById('order-company').value=c; document.getElementById('company-suggestions').innerHTML=''; document.getElementById('company-suggestions-wrap').style.display='none'; updateOrderBtn(); }
+function selectCompany(c) { S.orderCompany=c; renderOrderSheet(); }
 function updateCompanyList() {
   const el = document.getElementById('company-suggestions');
-  const wrap = document.getElementById('company-suggestions-wrap');
-  if (!el || !wrap) return;
-  const q = S.orderCompany.trim();
-  if (!q) { wrap.style.display='none'; el.innerHTML=''; return; }
+  if (!el) return;
   const pastCompanies = [...new Set(S.historyData.map(h=>h.company))].filter(Boolean);
-  const filtered = pastCompanies.filter(c=>c.includes(q));
-  if (!filtered.length) { wrap.style.display='none'; el.innerHTML=''; return; }
-  wrap.style.display='block';
-  el.innerHTML = filtered.map(c=>`<div style="font-size:13px;padding:8px 12px;border-radius:10px;border:1px solid #e5e5ea;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('');
+  const filtered = S.orderCompany ? pastCompanies.filter(c=>c.includes(S.orderCompany)) : pastCompanies;
+  el.innerHTML = filtered.map(c=>`<div style="font-size:12px;padding:4px 10px;border-radius:14px;border:1px solid #d1d1d6;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('');
 }
 function updateOrderBtn() {
   const btn = document.querySelector('.send-execute');
@@ -563,16 +565,15 @@ async function sendOrder() {
     const row = [
       S.orderCompany,                          // A: お渡し先
       g.name,                                  // B: 商品名
-      S.orderQty,                              // C: 個数
-      g.shop,                                  // D: 店舗名
-      g.detail||'',                            // E: 内容
-      g.price||'',                             // F: 価格
-      S.person + '（' + S.dept + '）',         // G: 発注者
-      S.purpose,                               // H: 目的
-      S.date||'',                              // I: 渡す日
-      S.delivery ? '配送' : '持参',            // J: 持参配送
-      S.deliveryTo||'',                        // K: 配送先
-      new Date().toLocaleDateString('ja-JP'),  // L: 記録日
+      g.shop,                                  // C: 店舗名
+      g.detail||'',                            // D: 内容
+      g.price||'',                             // E: 価格
+      S.person + '（' + S.dept + '）',         // F: 発注者
+      S.purpose,                               // G: 目的
+      S.date||'',                              // H: 渡す日
+      S.delivery ? '配送' : '持参',            // I: 持参配送
+      S.deliveryTo||'',                        // J: 配送先
+      new Date().toLocaleDateString('ja-JP'),  // K: 記録日
     ];
     await fetch(SHEETS_URL + '?action=addHistory&data=' + encodeURIComponent(JSON.stringify(row)), {
       redirect: 'follow'
