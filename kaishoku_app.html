@@ -527,6 +527,13 @@ async function sendLine() {
   }
 }
 function reSearch() {
+  const cards = document.querySelectorAll('#result-cards .result-card');
+  const excludeNames = [];
+  cards.forEach(function(card) {
+    const idx = parseInt(card.dataset.index);
+    if (!isNaN(idx) && lastShops[idx]) excludeNames.push(lastShops[idx].name);
+  });
+  lastConditions.excludeNames = excludeNames;
   document.getElementById('results').style.display = 'none';
   document.getElementById('result-cards').innerHTML = '';
   document.getElementById('line-btn').disabled = false;
@@ -534,15 +541,6 @@ function reSearch() {
   document.getElementById('line-btn').classList.remove('sent');
   document.getElementById('error-msg').style.display = 'none';
   submitForm();
-}
-function resetForm() {
-  document.getElementById('results').style.display = 'none';
-  document.getElementById('result-cards').innerHTML = '';
-  document.getElementById('line-btn').disabled = false;
-  document.getElementById('line-btn').textContent = 'LINE で予約リクエストを送信する';
-  document.getElementById('line-btn').classList.remove('sent');
-  document.getElementById('error-msg').style.display = 'none';
-  document.getElementById('form-section').style.display = 'block';
 }
 </script>
 </body>
