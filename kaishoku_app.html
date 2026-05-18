@@ -542,6 +542,15 @@ function reSearch() {
   document.getElementById('error-msg').style.display = 'none';
   submitForm();
 }
+  function resetForm() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('result-cards').innerHTML = '';
+  document.getElementById('line-btn').disabled = false;
+  document.getElementById('line-btn').textContent = 'LINE で予約リクエストを送信する';
+  document.getElementById('line-btn').classList.remove('sent');
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('form-section').style.display = 'block';
+}
 </script>
 </body>
 </html>
