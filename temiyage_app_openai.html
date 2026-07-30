@@ -25,6 +25,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-ser
 .tab { font-size: 13px; font-weight: 600; padding: 6px 18px; border-radius: 20px; border: 1px solid #d1d1d6; color: #8e8e93; cursor: pointer; }
 .tab.on { background: #1c1c1e; color: #fff; border-color: #1c1c1e; }
 input[type=text], input[type=date], input[type=number], select, textarea { width: 100%; font-size: 14px; padding: 10px 12px; border-radius: 10px; border: 1px solid #d1d1d6; background: #fff; color: #1c1c1e; -webkit-appearance: none; appearance: none; }
+input[type=date] { cursor: pointer; }
 .delivery-box { background: #f2f2f7; border-radius: 12px; padding: 12px; margin-top: 8px; }
 .go-btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 14px; border: none; background: #1c1c1e; color: #fff; cursor: pointer; margin-top: 4px; transition: opacity 0.15s; }
 .go-btn:disabled { opacity: 0.3; cursor: not-allowed; }
@@ -34,14 +35,14 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
 @keyframes spin { to { transform: rotate(360deg); } }
 .error-box { background: #fff0f0; border-radius: 12px; padding: 14px; text-align: center; font-size: 13px; color: #c0392b; }
 .result-header { font-size: 13px; font-weight: 600; color: #8e8e93; margin-bottom: 12px; }
-.gift-card { background: #fff; border-radius: 16px; border: 1px solid #e5e5ea; overflow: hidden; margin-bottom: 12px; cursor: pointer; transition: transform 0.1s; }
+.gift-card { background: #fff; border-radius: 16px; border: 1px solid #e5e5ea; overflow: hidden; margin-bottom: 12px; transition: transform 0.1s; }
 .gift-card:active { transform: scale(0.98); }
-.gift-img-wrap { width: 100%; height: 140px; background: #f2f2f7; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #8e8e93; overflow: hidden; }
+.gift-img-wrap { width: 100%; height: 140px; background: #f2f2f7; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #8e8e93; overflow: hidden; cursor: pointer; }
 .gift-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
-.gift-body { padding: 12px 14px; }
+.gift-body { padding: 12px 14px; cursor: pointer; }
 .gift-name { font-size: 14px; font-weight: 700; color: #1c1c1e; margin-bottom: 3px; }
 .gift-shop { font-size: 12px; color: #8e8e93; margin-bottom: 6px; }
-.gift-foot { display: flex; justify-content: space-between; align-items: center; }
+.gift-foot { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .gift-price { font-size: 15px; font-weight: 700; color: #1c1c1e; }
 .badges { display: flex; gap: 5px; flex-wrap: wrap; }
 .badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: #e8f4fd; color: #1a73e8; }
@@ -50,6 +51,9 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
 .badge-season { background: #e8f5e9; color: #2e7d32; }
 .gift-reason { font-size: 12px; color: #8e8e93; margin-top: 6px; line-height: 1.5; }
 .expiry-alert { font-size: 11px; color: #c0392b; margin-top: 4px; }
+.gift-actions { display: flex; justify-content: flex-end; padding: 0 14px 12px; }
+.keep-btn { font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px; border: 1.5px solid #d1d1d6; background: #fff; color: #8e8e93; cursor: pointer; transition: all 0.15s; }
+.keep-btn.kept { background: #fff3cd; color: #856404; border-color: #f0c040; }
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; justify-content: center; }
 .modal-overlay.open { display: flex; }
 .modal { background: #fff; border-radius: 24px 24px 0 0; width: 100%; max-width: 480px; max-height: 88vh; overflow-y: auto; padding: 16px; }
@@ -94,15 +98,14 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
 .qty-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
 .qty-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #d1d1d6; background: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
 .qty-num { font-size: 20px; font-weight: 700; min-width: 32px; text-align: center; }
-
-/* ── モード選択 ── */
+.departure-box { background: #f2f2f7; border-radius: 12px; padding: 12px; margin-top: 8px; }
+/* モード選択 */
 .mode-select-wrap { display: flex; gap: 10px; margin-bottom: 20px; }
 .mode-btn { flex: 1; padding: 20px 10px 16px; border-radius: 18px; border: 1.5px solid #e5e5ea; background: #fff; cursor: pointer; text-align: center; transition: all 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 .mode-btn:active { transform: scale(0.97); }
 .mode-btn .mode-label { font-size: 14px; font-weight: 700; color: #1c1c1e; margin-top: 10px; line-height: 1.5; }
 .mode-btn .mode-desc { font-size: 11px; color: #8e8e93; margin-top: 4px; line-height: 1.6; }
-
-/* ── お店から選ぶ ── */
+/* お店から選ぶ */
 .store-search-input { width: 100%; font-size: 15px; padding: 12px 14px; border-radius: 12px; border: 1.5px solid #d1d1d6; background: #fff; color: #1c1c1e; outline: none; -webkit-appearance: none; }
 .store-search-input:focus { border-color: #1c1c1e; }
 .store-suggestions { background: #fff; border-radius: 12px; border: 1px solid #e5e5ea; overflow: hidden; margin-top: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
@@ -113,7 +116,6 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
 .store-suggestion-loc { font-size: 11px; color: #8e8e93; }
 .store-selected-badge { display: flex; align-items: center; justify-content: space-between; background: #1c1c1e; color: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
 .store-selected-name { font-size: 14px; font-weight: 700; }
-.store-selected-loc { font-size: 11px; opacity: 0.7; margin-top: 2px; }
 .store-clear-btn { font-size: 20px; opacity: 0.6; cursor: pointer; background: none; border: none; color: #fff; padding: 0 0 0 10px; }
 .store-products-header { font-size: 13px; font-weight: 600; color: #8e8e93; margin-bottom: 10px; }
 .back-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #8e8e93; cursor: pointer; margin-bottom: 14px; border: none; background: none; padding: 0; }
@@ -132,26 +134,19 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
 </div>
 
 <div id="page-search" class="page active">
-
-  <!-- モード選択 -->
   <div id="mode-select-area">
     <div style="font-size:13px;color:#8e8e93;margin-bottom:12px;text-align:center">どちらで探しますか？</div>
     <div class="mode-select-wrap">
-
-      <!-- AIボタン -->
       <div class="mode-btn" onclick="selectMode('ai')">
         <img src="icon_ai.png" style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto">
         <div class="mode-label">AIにおすすめ<br>を聞く</div>
         <div class="mode-desc">条件を入力して<br>AIが最適候補を提案</div>
       </div>
-
-      <!-- お店ボタン -->
       <div class="mode-btn" onclick="selectMode('store')">
         <img src="icon_store.png" style="width:80px;height:80px;object-fit:contain;display:block;margin:0 auto">
         <div class="mode-label">お店から<br>選ぶ</div>
         <div class="mode-desc">店舗を選んで<br>商品を指定</div>
       </div>
-
     </div>
   </div>
 
@@ -165,28 +160,25 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
     </div>
     <hr class="divider">
     <div class="section">
-      <div class="lbl">訪問目的</div>
+      <div class="lbl">訪問目的（複数選択可）</div>
       <div class="chips" id="purpose-chips"></div>
+      <div id="departure-box" style="display:none;margin-top:10px">
+        <div class="departure-box">
+          <div class="lbl">出発時間</div>
+          <input type="time" id="departure-time" style="margin-top:4px">
+        </div>
+      </div>
     </div>
     <div class="section">
-      <div class="lbl">相手の役職</div>
-      <div class="chips" id="role-chips"></div>
-    </div>
-    <div class="section">
-      <div class="lbl">相手の所在地</div>
-      <div class="chips" id="region-chips"></div>
+      <div class="lbl">雰囲気・こだわり（複数選択可）</div>
+      <div class="chips" id="vibe-chips"></div>
     </div>
     <hr class="divider">
     <div class="section">
       <div class="lbl">渡す日</div>
-      <div style="position:relative;display:inline-block;width:100%">
-        <div id="date-btn" onclick="document.getElementById('date-input').focus()"
-          style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;border:1px solid #d1d1d6;background:#fff;cursor:pointer">
-          <span id="date-display-text" style="font-size:14px;color:#8e8e93">タップして日付を選ぶ</span>
-          <span id="date-clear" style="display:none;font-size:18px;color:#8e8e93" onclick="event.stopPropagation();clearDate()">×</span>
-        </div>
-        <input type="date" id="date-input" onchange="setDate(this.value)"
-          style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1">
+      <input type="date" id="date-input" onchange="setDate(this.value)" style="margin-bottom:4px">
+      <div id="date-clear-wrap" style="display:none;text-align:right">
+        <span style="font-size:12px;color:#8e8e93;cursor:pointer" onclick="clearDate()">× クリア</span>
       </div>
     </div>
     <div class="section">
@@ -216,8 +208,7 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
         <div class="lbl">店舗名を入力</div>
         <input type="text" class="store-search-input" id="store-search-input"
           placeholder="店名をひらがな・カタカナ・英字で…"
-          oninput="onStoreSearchInput(this.value)"
-          autocomplete="off">
+          oninput="onStoreSearchInput(this.value)" autocomplete="off">
         <div id="store-suggestions-wrap" style="display:none;margin-top:4px">
           <div class="store-suggestions" id="store-suggestions-list"></div>
         </div>
@@ -247,19 +238,14 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
         </div>
       </div>
       <div class="order-form-section">
-        <div class="order-form-label">訪問目的</div>
+        <div class="order-form-label">訪問目的（複数選択可）</div>
         <div class="chips" id="store-purpose-chips"></div>
       </div>
       <div class="order-form-section">
         <div class="order-form-label">渡す日</div>
-        <div style="position:relative;display:inline-block;width:100%">
-          <div onclick="document.getElementById('store-date-input').focus()"
-            style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;border:1px solid #d1d1d6;background:#fff;cursor:pointer">
-            <span id="store-date-display" style="font-size:14px;color:#8e8e93">タップして日付を選ぶ</span>
-            <span id="store-date-clear" style="display:none;font-size:18px;color:#8e8e93" onclick="event.stopPropagation();clearStoreDate()">×</span>
-          </div>
-          <input type="date" id="store-date-input" onchange="setStoreDate(this.value)"
-            style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:1">
+        <input type="date" id="store-date-input" onchange="setStoreDate(this.value)" style="margin-bottom:4px">
+        <div id="store-date-clear-wrap" style="display:none;text-align:right">
+          <span style="font-size:12px;color:#8e8e93;cursor:pointer" onclick="clearStoreDate()">× クリア</span>
         </div>
       </div>
       <div class="order-form-section">
@@ -289,7 +275,7 @@ input[type=text], input[type=date], input[type=number], select, textarea { width
 
 <div id="page-history" class="page">
   <div class="search-box-wrap">
-    <input type="text" class="search-box" id="history-search" placeholder="🔍 社名・商品名・担当者で検索" oninput="renderHistory()">
+    <input type="text" class="search-box" id="history-search" placeholder="🔍 社名・支店名・商品名・担当者で検索" oninput="renderHistory()">
   </div>
   <div class="filter-row" id="history-filters"></div>
   <div id="history-content"></div>
@@ -320,23 +306,25 @@ const STORE_READINGS = {
   '御菓子處五島': ['おかしどころごとう','ごとう','五島'],
   '福島菓子舗': ['ふくしまかしほ','ふくしま'],
 };
+const PURPOSES = ['訪問','御礼','謝罪','会食'];
+const VIBES = ['大人数','シニア','高級感','福岡銘菓','ごはんのおとも','軽い','塩味'];
+
 const S = {
-  dept:'BR', person:null, purpose:null, role:null, region:null,
+  dept:'BR', person:null, purposes:[], vibes:[],
   date:'', budgetMin:0, budgetMax:99999, budgetLabel:'指定なし',
   delivery:false, deliveryTo:'', deliveryAddr:'',
   hFilter:'すべて', pickedGift:null, orderSent:false, orderCompany:'', orderQty:1,
-  gifts:[], historyData:[],
+  gifts:[], historyData:[], keptIds: new Set(),
   mode:null, selectedStore:null, selectedStoreProduct:null,
   storeDept:'BR', storePerson:null, storeOrderCompany:'',
-  storePurpose:null, storeDate:'', storeQty:1,
+  storePurposes:[], storeDate:'', storeQty:1,
   storeDelivery:false, storeDeliveryTo:'',
 };
 
 window.onload = async () => {
-  renderDeptTabs(); renderMemberChips(); renderPurposeChips();
-  renderRoleChips(); renderRegionChips(); renderDeliveryChips(); renderBudgetChips();
-  renderHistoryFilters(); renderStoreDeptTabs(); renderStoreMemberChips();
-  renderStorePurposeChips(); renderStoreDeliveryChips();
+  renderDeptTabs(); renderMemberChips(); renderPurposeChips(); renderVibeChips();
+  renderDeliveryChips(); renderBudgetChips(); renderHistoryFilters();
+  renderStoreDeptTabs(); renderStoreMemberChips(); renderStorePurposeChips(); renderStoreDeliveryChips();
   await loadGiftsFromSheets();
 };
 
@@ -372,9 +360,21 @@ async function loadGiftsFromSheets() {
         cat: row['カテゴリ'] || '',
         price: row['価格（税込）'] ? Number(row['価格（税込）']) : null,
         detail: row['内容・個数'] || '',
-        purpose: row['訪問目的'] ? row['訪問目的'].split(',').map(s=>s.trim()) : [],
+        // 訪問目的チェックボックス
+        purposeVisit:  row['訪問']===true||row['訪問']==='TRUE',
+        purposeOreire: row['御礼']===true||row['御礼']==='TRUE',
+        purposeSyazai: row['謝罪']===true||row['謝罪']==='TRUE',
+        purposeKaisyoku: row['会食']===true||row['会食']==='TRUE',
+        // 雰囲気タグ
+        vibeTaisu:   row['大人数']===true||row['大人数']==='TRUE',
+        vibeSenior:  row['シニア']===true||row['シニア']==='TRUE',
+        vibeKoukyuu: row['高級感']===true||row['高級感']==='TRUE',
+        vibeFukuoka: row['福岡銘菓']===true||row['福岡銘菓']==='TRUE',
+        vibeGohan:   row['ごはんのおとも']===true||row['ごはんのおとも']==='TRUE',
+        vibeKarui:   row['軽い']===true||row['軽い']==='TRUE',
+        vibeShioaji: row['塩味']===true||row['塩味']==='TRUE',
         note: row['備考'] || '',
-        cold: row['要冷蔵']==='〇'||row['要冷蔵']==='要冷蔵',
+        cold: row['要冷蔵']==='〇'||row['要冷蔵']==='要冷蔵'||row['要冷蔵']===true,
         season: row['季節限定'] || null,
         expiry: row['賞味期限（日数）'] ? Number(row['賞味期限（日数）']) : null,
         photo1: row['写真URL'] || null,
@@ -392,17 +392,13 @@ function formatDate(d) {
 }
 function isUrl(s) { return s && (s.startsWith('http://')||s.startsWith('https://')); }
 
+// ===== モード選択 =====
 function selectMode(mode) {
   S.mode = mode;
   document.getElementById('mode-select-area').style.display = 'none';
-  if (mode==='ai') {
-    document.getElementById('ai-search-area').style.display = 'block';
-    document.getElementById('store-search-area').style.display = 'none';
-  } else {
-    document.getElementById('ai-search-area').style.display = 'none';
-    document.getElementById('store-search-area').style.display = 'block';
-    resetStoreFlow();
-  }
+  document.getElementById('ai-search-area').style.display = mode==='ai' ? 'block' : 'none';
+  document.getElementById('store-search-area').style.display = mode==='store' ? 'block' : 'none';
+  if (mode==='store') resetStoreFlow();
 }
 function resetMode() {
   S.mode = null;
@@ -411,80 +407,313 @@ function resetMode() {
   document.getElementById('store-search-area').style.display = 'none';
 }
 
-function getUniqueStores() {
-  const map = {};
-  S.gifts.forEach(g => {
-    if (g.shop && !map[g.shop]) map[g.shop] = { name:g.shop, loc:g.loc, count:0 };
-    if (g.shop) map[g.shop].count++;
+// ===== 発注者 =====
+function showPage(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const idx={'search':0,'history':1}[page];document.querySelectorAll('.nav-btn')[idx].classList.add('active');if(page==='history')renderHistory();}
+function renderDeptTabs(){document.getElementById('dept-tabs').innerHTML=Object.keys(DEPTS).map(d=>`<div class="tab ${S.dept===d?'on':''}" onclick="selectDept('${d}')">${d}</div>`).join('');}
+function selectDept(d){S.dept=d;S.person=null;renderDeptTabs();renderMemberChips();updateGoBtn();}
+function renderMemberChips(){document.getElementById('member-chips').innerHTML=DEPTS[S.dept].map(m=>`<div class="chip ${S.person===m?'on':''}" onclick="selectMember('${m}')">${m}</div>`).join('');}
+function selectMember(m){S.person=m;renderMemberChips();updateGoBtn();}
+
+// ===== 訪問目的（複数選択） =====
+function renderPurposeChips(){
+  document.getElementById('purpose-chips').innerHTML=PURPOSES.map(v=>
+    `<div class="chip ${S.purposes.includes(v)?'on':''}" onclick="togglePurpose('${v}')">${v}</div>`
+  ).join('');
+  document.getElementById('departure-box').style.display = S.purposes.includes('訪問') ? 'block' : 'none';
+}
+function togglePurpose(v){
+  if(S.purposes.includes(v)) S.purposes=S.purposes.filter(p=>p!==v);
+  else S.purposes.push(v);
+  renderPurposeChips(); updateGoBtn();
+}
+
+// ===== 雰囲気タグ（複数選択） =====
+function renderVibeChips(){
+  document.getElementById('vibe-chips').innerHTML=VIBES.map(v=>
+    `<div class="chip ${S.vibes.includes(v)?'on':''}" onclick="toggleVibe('${v}')">${v}</div>`
+  ).join('');
+}
+function toggleVibe(v){
+  if(S.vibes.includes(v)) S.vibes=S.vibes.filter(x=>x!==v);
+  else S.vibes.push(v);
+  renderVibeChips();
+}
+
+// ===== 日付（PC対応：input[type=date]をそのまま表示） =====
+function setDate(v){
+  S.date=v;
+  document.getElementById('date-clear-wrap').style.display = v ? 'block' : 'none';
+}
+function clearDate(){
+  S.date='';
+  document.getElementById('date-input').value='';
+  document.getElementById('date-clear-wrap').style.display='none';
+}
+
+// ===== 予算 =====
+const BUDGET_OPTIONS=[{label:'指定なし',min:0,max:99999},{label:'〜¥3,000',min:0,max:3000},{label:'¥3,000〜¥5,000',min:3000,max:5000},{label:'¥5,000〜¥10,000',min:5000,max:10000},{label:'¥10,000〜¥15,000',min:10000,max:15000}];
+function renderBudgetChips(){const el=document.getElementById('budget-chips');if(!el)return;el.innerHTML=BUDGET_OPTIONS.map(o=>`<div class="chip ${S.budgetLabel===o.label?'on':''}" onclick="selectBudget('${o.label}',${o.min},${o.max})">${o.label}</div>`).join('');}
+function selectBudget(label,min,max){S.budgetLabel=label;S.budgetMin=min;S.budgetMax=max;renderBudgetChips();updateGoBtn();}
+
+// ===== 配送 =====
+function renderDeliveryChips(){const el=document.getElementById('delivery-chips');el.innerHTML=['持参','配送'].map(v=>{const on=(v==='配送'&&S.delivery)||(v==='持参'&&!S.delivery);return`<div class="chip ${on?'on':''}" onclick="selectDelivery('${v}')">${v}</div>`;}).join('');document.getElementById('delivery-box').style.display=S.delivery?'block':'none';}
+function selectDelivery(v){S.delivery=(v==='配送');renderDeliveryChips();if(S.delivery){const el=document.getElementById('delivery-to-chips');el.innerHTML=['先方オフィス','ホテル','自宅'].map(t=>`<div class="chip ${S.deliveryTo===t?'on':''}" onclick="selectDeliveryTo('${t}')">${t}</div>`).join('');}}
+function selectDeliveryTo(v){S.deliveryTo=v;document.getElementById('delivery-to-chips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.textContent===v));}
+
+function updateGoBtn(){
+  const btn=document.getElementById('go-btn');
+  const ok=S.person && S.purposes.length>0;
+  btn.disabled=!ok;
+  btn.textContent=ok?`${S.person}さんの候補を生成 ↗`:'発注者と訪問目的を選んでください';
+}
+
+function daysLeft(){if(!S.date)return null;return Math.round((new Date(S.date)-new Date())/86400000);}
+function expiryAlert(g){const d=daysLeft();if(d!==null&&g.expiry&&d>g.expiry)return`渡す日まで${d}日。賞味期限（約${g.expiry}日）に注意`;return null;}
+
+// ===== AI候補生成 =====
+async function generateCandidates(){
+  const resultArea=document.getElementById('result-area');
+  const btn=document.getElementById('go-btn');
+  btn.disabled=true; btn.textContent='生成中...';
+  resultArea.innerHTML='<div class="loading"><div class="spinner"></div>AIが候補を選定しています...</div>';
+
+  // キープ済みの商品を取得
+  const keptGifts = S.gifts.filter(g => S.keptIds.has(g.id));
+
+  const params={
+    person:S.person, dept:S.dept, purposes:S.purposes, vibes:S.vibes,
+    date:S.date, budgetLabel:S.budgetLabel,
+    budgetMin:S.budgetMin, budgetMax:S.budgetMax,
+    delivery:S.delivery, deliveryTo:S.deliveryTo,
+    keptIds: [...S.keptIds],
+    randomSeed: Math.random(), // ランダム性のため
+  };
+
+  try {
+    const res=await fetch(SHEETS_URL+'?action=ai&params='+encodeURIComponent(JSON.stringify(params)),{redirect:'follow'});
+    const text=await res.text();
+    const data=JSON.parse(text);
+    if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));
+    if(!data.choices||!data.choices[0])throw new Error('AIからの応答が不正です。もう一度お試しください。');
+    const content=data.choices[0].message.content;
+    const picks=JSON.parse(content.replace(/```json|```/g,'').trim());
+    // キープ以外の新しい候補
+    const newResults=picks.map(p=>({...S.gifts.find(g=>g.id==p.id),reason:p.reason,tag:p.tag})).filter(g=>g&&!S.keptIds.has(g.id));
+    // キープ済み＋新候補を合わせて表示
+    renderResults([...keptGifts.map(g=>({...g,kept:true})), ...newResults]);
+  } catch(e){
+    resultArea.innerHTML=`<div class="error-box">エラー：${e.message||'生成に失敗しました'}</div>`;
+  }
+  btn.disabled=false; btn.textContent=`${S.person}さんの候補を生成 ↗`;
+}
+
+// ===== 結果表示（キープボタン付き） =====
+function renderResults(gifts){
+  let html=`<div class="result-header">おすすめ候補 ${gifts.length}件（タップで詳細）${S.keptIds.size>0?` ／ キープ中 ${S.keptIds.size}件`:''}</div>`;
+  gifts.forEach(g=>{
+    const al=expiryAlert(g);
+    const kept=S.keptIds.has(g.id);
+    const gJson=JSON.stringify({id:g.id,name:g.name,shop:g.shop,loc:g.loc,cat:g.cat,price:g.price,detail:g.detail,note:g.note,cold:g.cold,season:g.season,expiry:g.expiry,photo1:g.photo1,reason:g.reason||'',tag:g.tag||''}).replace(/"/g,'&quot;');
+    html+=`<div class="gift-card" style="${kept?'border-color:#f0c040;':''}">
+      <div class="gift-img-wrap" onclick="showModal(${gJson})">
+        ${g.photo1?`<img src="${g.photo1}" onerror="this.parentNode.innerHTML='写真なし'">` :'写真なし'}
+      </div>
+      <div class="gift-body" onclick="showModal(${gJson})">
+        <div class="gift-name">${kept?'⭐ ':''} ${g.name}</div>
+        <div class="gift-shop">${g.shop}（${g.loc}）</div>
+        <div class="gift-foot">
+          <span class="gift-price">${g.price?'¥'+g.price.toLocaleString():'要確認'}</span>
+          <div class="badges">
+            <span class="badge">${g.tag||g.cat}</span>
+            ${g.cold?'<span class="badge badge-warn">要冷蔵</span>':''}
+            ${g.season?`<span class="badge badge-season">${g.season}</span>`:''}
+            ${al?'<span class="badge badge-danger">期限注意</span>':''}
+          </div>
+        </div>
+        <div class="gift-reason">${g.reason||''}</div>
+        ${al?`<div class="expiry-alert">${al}</div>`:''}
+      </div>
+      <div class="gift-actions">
+        <button class="keep-btn ${kept?'kept':''}" onclick="toggleKeep(${g.id})">${kept?'⭐ キープ中':'☆ キープ'}</button>
+      </div>
+    </div>`;
   });
-  return Object.values(map);
+  document.getElementById('result-area').innerHTML=html;
 }
-function matchStore(store, query) {
-  if (!query) return false;
-  const q = query.toLowerCase();
-  if (store.name.toLowerCase().includes(q)) return true;
-  return (STORE_READINGS[store.name]||[]).some(r=>r.toLowerCase().includes(q));
+
+function toggleKeep(id){
+  if(S.keptIds.has(id)) S.keptIds.delete(id);
+  else S.keptIds.add(id);
+  // 現在表示中のカードだけ更新
+  const resultArea=document.getElementById('result-area');
+  const currentGifts=S.gifts.filter(g=>resultArea.innerHTML.includes(`"id":${g.id},`)||resultArea.innerHTML.includes(`id=${g.id}`));
+  // 全体再描画
+  const allShownIds=[...resultArea.querySelectorAll('.keep-btn')].map(b=>{
+    const card=b.closest('.gift-card');
+    const onclick=b.getAttribute('onclick');
+    const m=onclick.match(/toggleKeep\((\d+)\)/);
+    return m?Number(m[1]):null;
+  }).filter(Boolean);
+  const shownGifts=allShownIds.map(id=>S.gifts.find(g=>g.id===id)).filter(Boolean);
+  // reasonとtagを保持するため既存の表示から取得
+  const header=resultArea.querySelector('.result-header');
+  renderResults(shownGifts.map(g=>({
+    ...g,
+    reason: (() => { try { const el=resultArea.querySelector(`.gift-reason`); return ''; } catch(e){ return ''; } })(),
+  })));
+  // 再検索ボタンのテキスト更新
+  const btn=document.getElementById('go-btn');
+  if(S.person&&S.purposes.length>0){
+    btn.disabled=false;
+    btn.textContent=S.keptIds.size>0?`再検索（キープ${S.keptIds.size}件を残す）↗`:`${S.person}さんの候補を生成 ↗`;
+  }
 }
-function onStoreSearchInput(val) {
-  const wrap = document.getElementById('store-suggestions-wrap');
-  const list = document.getElementById('store-suggestions-list');
-  const noRes = document.getElementById('store-no-result');
-  if (!val.trim()) { wrap.style.display='none'; noRes.style.display='none'; return; }
-  const matched = getUniqueStores().filter(s=>matchStore(s,val));
-  if (!matched.length) { wrap.style.display='none'; noRes.style.display='block'; return; }
-  noRes.style.display='none'; wrap.style.display='block';
-  list.innerHTML = matched.map(s =>
-    `<div class="store-suggestion-item" onclick="selectStore(${JSON.stringify(s).replace(/"/g,'&quot;')})">
-      <span class="store-suggestion-name">${s.name}</span>
-      <span class="store-suggestion-loc">${s.loc}｜商品${s.count}点</span>
-    </div>`).join('');
+
+function showModal(gStr){
+  const g=typeof gStr==='string'?JSON.parse(gStr.replace(/&quot;/g,'"')):gStr;
+  S.pickedGift=g;
+  const al=expiryAlert(g);
+  document.getElementById('modal-content').innerHTML=`
+    <div class="modal-handle"></div>
+    <div class="modal-img-wrap">${g.photo1?`<img src="${g.photo1}" onerror="this.parentNode.innerHTML='写真なし'">` :'写真なし'}</div>
+    <div class="modal-name">${g.name}</div>
+    <div class="modal-shop">${g.shop}（${g.loc}）</div>
+    <div class="modal-row"><span class="modal-lbl">内容</span><span class="modal-val">${g.detail||'—'}</span></div>
+    <div class="modal-row"><span class="modal-lbl">価格（税込）</span><span class="modal-val">${g.price?'¥'+g.price.toLocaleString():'要確認'}</span></div>
+    <div class="modal-row"><span class="modal-lbl">要冷蔵</span><span class="modal-val ${g.cold?'warn':''}">${g.cold?'要冷蔵':'不要'}</span></div>
+    <div class="modal-row"><span class="modal-lbl">賞味期限目安</span><span class="modal-val ${al?'danger':''}">約${g.expiry||'—'}日${al?' ⚠':''}</span></div>
+    ${g.season?`<div class="modal-row"><span class="modal-lbl">季節限定</span><span class="modal-val">${g.season}</span></div>`:''}
+    <div class="modal-row"><span class="modal-lbl">備考</span><span class="modal-val">${g.note||'—'}</span></div>
+    <div class="modal-row"><span class="modal-lbl">おすすめ理由</span><span class="modal-val">${g.reason||'—'}</span></div>
+    ${S.delivery?`<div class="modal-row"><span class="modal-lbl">配送先</span><span class="modal-val">${S.deliveryTo||'—'}${S.deliveryAddr?' / '+S.deliveryAddr:''}</span></div>`:''}
+    <button class="order-btn" onclick="showOrder()">手土産発注 ↗</button>
+    <button class="modal-close" onclick="closeModalDirect()">閉じる</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
 }
-function selectStore(store) {
-  S.selectedStore = store;
+function closeModal(e){if(e.target===document.getElementById('modal-overlay'))closeModalDirect();}
+function closeModalDirect(){document.getElementById('modal-overlay').classList.remove('open');}
+
+function showOrder(){S.orderSent=false;S.orderQty=1;renderOrderSheet();document.getElementById('order-overlay').classList.add('open');}
+function closeOrder(e){if(e.target===document.getElementById('order-overlay'))document.getElementById('order-overlay').classList.remove('open');}
+function changeQty(delta){S.orderQty=Math.max(1,S.orderQty+delta);const el=document.getElementById('qty-display');if(el)el.textContent=S.orderQty;const sq=document.getElementById('summary-qty');if(sq)sq.textContent=S.orderQty+'個';}
+
+function renderOrderSheet(){
+  const g=S.pickedGift;
+  const purposeStr=S.purposes.join('・');
+  if(S.orderSent){
+    document.getElementById('order-content').innerHTML=`<div class="modal-handle"></div><div class="sent-wrap"><div class="sent-icon">✓</div><div style="font-size:18px;font-weight:700;margin-bottom:8px">発注・履歴記録完了</div><div style="font-size:14px;color:#8e8e93;line-height:1.7">グループLINEに通知しました。</div><button class="send-execute" style="margin-top:24px" onclick="document.getElementById('order-overlay').classList.remove('open');document.getElementById('modal-overlay').classList.remove('open')">閉じる</button></div>`;
+    return;
+  }
+  document.getElementById('order-content').innerHTML=`
+    <div class="modal-handle"></div>
+    <div class="order-title">手土産発注・履歴記録</div>
+    <div class="order-sub">お渡し先を入力して記録してください</div>
+    <div class="lbl" style="margin-bottom:6px">お渡し先の会社名</div>
+    <input type="text" id="order-company" placeholder="例：丸紅不動産 福岡支店" value="${S.orderCompany||''}"
+      oninput="S.orderCompany=this.value;updateOrderBtn();updateCompanyList()" style="margin-bottom:6px">
+    <div id="company-suggestions-wrap" style="display:none;margin-bottom:12px">
+      <div style="display:flex;flex-direction:column;gap:3px" id="company-suggestions"></div>
+    </div>
+    <div class="lbl" style="margin-bottom:8px">発注個数</div>
+    <div class="qty-row">
+      <button class="qty-btn" onclick="changeQty(-1)">−</button>
+      <span class="qty-num" id="qty-display">${S.orderQty}</span>
+      <button class="qty-btn" onclick="changeQty(1)">＋</button>
+      <span style="font-size:13px;color:#8e8e93">個</span>
+    </div>
+    <div class="order-summary">
+      商品：<span>${g.name}</span><br>
+      店舗：<span>${g.shop}（${g.loc}）</span><br>
+      価格：<span>¥${g.price?g.price.toLocaleString():'要確認'}</span><br>
+      個数：<span id="summary-qty">${S.orderQty}個</span><br>
+      発注者：<span>${S.person}（${S.dept}）</span><br>
+      目的：<span>${purposeStr}</span><br>
+      渡す日：<span>${S.date||'未定'}</span><br>
+      ${S.delivery?`配送先：<span>${S.deliveryTo||'—'}</span>`:'持参'}
+    </div>
+    <button class="send-execute" id="record-btn" onclick="sendOrder()" ${!S.orderCompany?'disabled style="opacity:0.35"':''}>
+      発注し履歴に記録する ↗
+    </button>
+    <button style="margin-top:8px;width:100%;padding:12px;font-size:14px;border-radius:14px;border:1px solid #d1d1d6;background:none;color:#8e8e93;cursor:pointer" onclick="document.getElementById('order-overlay').classList.remove('open')">戻る</button>`;
+}
+
+function selectCompany(c){S.orderCompany=c;const inp=document.getElementById('order-company');if(inp)inp.value=c;const wrap=document.getElementById('company-suggestions-wrap');if(wrap)wrap.style.display='none';updateOrderBtn();}
+function updateCompanyList(){
+  const el=document.getElementById('company-suggestions');
+  const wrap=document.getElementById('company-suggestions-wrap');
+  if(!el||!wrap)return;
+  const q=S.orderCompany.trim();
+  if(!q){wrap.style.display='none';el.innerHTML='';return;}
+  const past=[...new Set(S.historyData.map(h=>h.company))].filter(Boolean);
+  const filtered=past.filter(c=>c.includes(q));
+  if(!filtered.length){wrap.style.display='none';el.innerHTML='';return;}
+  wrap.style.display='block';
+  el.innerHTML=filtered.map(c=>`<div style="font-size:13px;padding:8px 12px;border-radius:10px;border:1px solid #e5e5ea;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('');
+}
+function updateOrderBtn(){const btn=document.getElementById('record-btn');if(btn){btn.disabled=!S.orderCompany;btn.style.opacity=S.orderCompany?'1':'0.35';}}
+
+async function sendOrder(){
+  const g=S.pickedGift;
+  if(!S.orderCompany)return;
+  const btn=document.getElementById('record-btn');
+  if(btn){btn.disabled=true;btn.textContent='記録中...';}
+  const today=new Date();
+  const dateStr=(today.getMonth()+1)+'/'+today.getDate();
+  const purposeStr=S.purposes.join('・');
+  S.historyData.unshift({
+    company:S.orderCompany,
+    date:S.date?S.date.slice(5).replace('-','/'):dateStr,
+    rawDate:S.date||today.toISOString(),
+    name:g.name, shop:g.shop, loc:g.loc,
+    detail:g.shop+'｜'+(g.detail||'')+'｜¥'+(g.price?g.price.toLocaleString():'要確認'),
+    person:S.person, purpose:purposeStr, delivery:S.delivery,
+  });
+  try {
+    const row=[S.orderCompany,g.name,S.orderQty,g.shop,g.detail||'',g.price||'',
+      S.person+'（'+S.dept+'）',purposeStr,S.date||'',
+      S.delivery?'配送':'持参',S.deliveryTo||'',new Date().toLocaleDateString('ja-JP')];
+    await fetch(SHEETS_URL+'?action=addHistory&data='+encodeURIComponent(JSON.stringify(row)),{redirect:'follow'});
+  } catch(e){console.log('履歴書き込みエラー:',e);}
+  S.orderSent=true; renderOrderSheet(); renderHistoryFilters();
+}
+
+// ===== 店舗から選ぶ =====
+function getUniqueStores(){const map={};S.gifts.forEach(g=>{if(g.shop&&!map[g.shop])map[g.shop]={name:g.shop,loc:g.loc,count:0};if(g.shop)map[g.shop].count++;});return Object.values(map);}
+function matchStore(store,query){if(!query)return false;const q=query.toLowerCase();if(store.name.toLowerCase().includes(q))return true;return(STORE_READINGS[store.name]||[]).some(r=>r.toLowerCase().includes(q));}
+function onStoreSearchInput(val){
+  const wrap=document.getElementById('store-suggestions-wrap');
+  const list=document.getElementById('store-suggestions-list');
+  const noRes=document.getElementById('store-no-result');
+  if(!val.trim()){wrap.style.display='none';noRes.style.display='none';return;}
+  const matched=getUniqueStores().filter(s=>matchStore(s,val));
+  if(!matched.length){wrap.style.display='none';noRes.style.display='block';return;}
+  noRes.style.display='none';wrap.style.display='block';
+  list.innerHTML=matched.map(s=>`<div class="store-suggestion-item" onclick="selectStore(${JSON.stringify(s).replace(/"/g,'&quot;')})"><span class="store-suggestion-name">${s.name}</span><span class="store-suggestion-loc">${s.loc}｜商品${s.count}点</span></div>`).join('');
+}
+function selectStore(store){
+  S.selectedStore=store;
   document.getElementById('store-step1').style.display='none';
   document.getElementById('store-step2').style.display='block';
   document.getElementById('store-step3').style.display='none';
-  const locUrl = isUrl(store.loc) ? store.loc : 'https://maps.google.com/?q='+encodeURIComponent(store.loc+' '+store.name);
-  document.getElementById('store-selected-badge-wrap').innerHTML = `
-    <div class="store-selected-badge">
-      <div>
-        <div class="store-selected-name">${store.name}</div>
-        <a href="${locUrl}" target="_blank" style="color:rgba(255,255,255,0.7);font-size:11px;text-decoration:underline">${store.loc} ↗</a>
-      </div>
-      <button class="store-clear-btn" onclick="resetStoreFlow()">×</button>
-    </div>`;
-  const products = S.gifts.filter(g=>g.shop===store.name);
-  document.getElementById('store-products-header').textContent = `商品一覧 ${products.length}点（タップして選択）`;
-  document.getElementById('store-products-list').innerHTML = products.map(g =>
-    `<div class="gift-card" onclick="selectStoreProduct(${JSON.stringify(g).replace(/"/g,'&quot;')})">
-      <div class="gift-img-wrap">${g.photo1?`<img src="${g.photo1}" onerror="this.parentNode.innerHTML='写真なし'">` :'写真なし'}</div>
-      <div class="gift-body">
-        <div class="gift-name">${g.name}</div>
-        <div class="gift-foot">
-          <span class="gift-price">${g.price?'¥'+g.price.toLocaleString():'要確認'}</span>
-          <div class="badges"><span class="badge">${g.cat}</span>${g.cold?'<span class="badge badge-warn">要冷蔵</span>':''}${g.season?`<span class="badge badge-season">${g.season}</span>`:''}</div>
-        </div>
-        <div class="gift-reason">${g.detail||''}</div>
-      </div>
-    </div>`).join('');
+  const locUrl=isUrl(store.loc)?store.loc:'https://maps.google.com/?q='+encodeURIComponent(store.loc+' '+store.name);
+  document.getElementById('store-selected-badge-wrap').innerHTML=`<div class="store-selected-badge"><div><div class="store-selected-name">${store.name}</div><a href="${locUrl}" target="_blank" style="color:rgba(255,255,255,0.7);font-size:11px;text-decoration:underline">${store.loc} ↗</a></div><button class="store-clear-btn" onclick="resetStoreFlow()">×</button></div>`;
+  const products=S.gifts.filter(g=>g.shop===store.name);
+  document.getElementById('store-products-header').textContent=`商品一覧 ${products.length}点（タップして選択）`;
+  document.getElementById('store-products-list').innerHTML=products.map(g=>`<div class="gift-card" onclick="selectStoreProduct(${JSON.stringify(g).replace(/"/g,'&quot;')})"><div class="gift-img-wrap">${g.photo1?`<img src="${g.photo1}" onerror="this.parentNode.innerHTML='写真なし'">` :'写真なし'}</div><div class="gift-body"><div class="gift-name">${g.name}</div><div class="gift-foot"><span class="gift-price">${g.price?'¥'+g.price.toLocaleString():'要確認'}</span><div class="badges"><span class="badge">${g.cat}</span>${g.cold?'<span class="badge badge-warn">要冷蔵</span>':''}${g.season?`<span class="badge badge-season">${g.season}</span>`:''}</div></div><div class="gift-reason">${g.detail||''}</div></div></div>`).join('');
 }
-function selectStoreProduct(g) {
-  S.selectedStoreProduct=g; S.storeQty=1;
+function selectStoreProduct(g){
+  S.selectedStoreProduct=g;S.storeQty=1;
   document.getElementById('store-step2').style.display='none';
   document.getElementById('store-step3').style.display='block';
   document.getElementById('store-qty-display').textContent=1;
-  document.getElementById('store-order-selected-product').innerHTML=`
-    <div style="background:#f2f2f7;border-radius:12px;padding:12px 14px;font-size:13px;color:#8e8e93;line-height:2">
-      商品：<span style="color:#1c1c1e;font-weight:700">${g.name}</span><br>
-      店舗：<span style="color:#1c1c1e;font-weight:600">${g.shop}</span><br>
-      価格：<span style="color:#1c1c1e;font-weight:600">${g.price?'¥'+g.price.toLocaleString():'要確認'}</span>
-    </div>`;
+  document.getElementById('store-order-selected-product').innerHTML=`<div style="background:#f2f2f7;border-radius:12px;padding:12px 14px;font-size:13px;color:#8e8e93;line-height:2">商品：<span style="color:#1c1c1e;font-weight:700">${g.name}</span><br>店舗：<span style="color:#1c1c1e;font-weight:600">${g.shop}</span><br>価格：<span style="color:#1c1c1e;font-weight:600">${g.price?'¥'+g.price.toLocaleString():'要確認'}</span></div>`;
   document.getElementById('store-order-company').value='';
-  S.storeOrderCompany=''; updateStoreOrderBtn();
+  S.storeOrderCompany='';S.storePurposes=[];
+  renderStorePurposeChips();updateStoreOrderBtn();
 }
-function backToProducts() { document.getElementById('store-step3').style.display='none'; document.getElementById('store-step2').style.display='block'; }
-function resetStoreFlow() {
-  S.selectedStore=null; S.selectedStoreProduct=null;
+function backToProducts(){document.getElementById('store-step3').style.display='none';document.getElementById('store-step2').style.display='block';}
+function resetStoreFlow(){
+  S.selectedStore=null;S.selectedStoreProduct=null;
   document.getElementById('store-search-input').value='';
   document.getElementById('store-suggestions-wrap').style.display='none';
   document.getElementById('store-no-result').style.display='none';
@@ -492,21 +721,30 @@ function resetStoreFlow() {
   document.getElementById('store-step2').style.display='none';
   document.getElementById('store-step3').style.display='none';
 }
-function renderStoreDeptTabs() { document.getElementById('store-dept-tabs').innerHTML=Object.keys(DEPTS).map(d=>`<div class="tab ${S.storeDept===d?'on':''}" onclick="selectStoreDept('${d}')">${d}</div>`).join(''); }
+function renderStoreDeptTabs(){document.getElementById('store-dept-tabs').innerHTML=Object.keys(DEPTS).map(d=>`<div class="tab ${S.storeDept===d?'on':''}" onclick="selectStoreDept('${d}')">${d}</div>`).join('');}
 function selectStoreDept(d){S.storeDept=d;S.storePerson=null;renderStoreDeptTabs();renderStoreMemberChips();updateStoreOrderBtn();}
 function renderStoreMemberChips(){document.getElementById('store-member-chips').innerHTML=DEPTS[S.storeDept].map(m=>`<div class="chip ${S.storePerson===m?'on':''}" onclick="selectStoreMember('${m}')">${m}</div>`).join('');}
 function selectStoreMember(m){S.storePerson=m;renderStoreMemberChips();updateStoreOrderBtn();}
-function renderStorePurposeChips(){document.getElementById('store-purpose-chips').innerHTML=['会食','訪問','御礼','謝罪'].map(v=>`<div class="chip ${S.storePurpose===v?'on':''}" onclick="selectStorePurpose('${v}')">${v}</div>`).join('');}
-function selectStorePurpose(v){S.storePurpose=v;renderStorePurposeChips();updateStoreOrderBtn();}
+function renderStorePurposeChips(){
+  document.getElementById('store-purpose-chips').innerHTML=PURPOSES.map(v=>
+    `<div class="chip ${S.storePurposes.includes(v)?'on':''}" onclick="toggleStorePurpose('${v}')">${v}</div>`
+  ).join('');
+}
+function toggleStorePurpose(v){
+  if(S.storePurposes.includes(v))S.storePurposes=S.storePurposes.filter(p=>p!==v);
+  else S.storePurposes.push(v);
+  renderStorePurposeChips();updateStoreOrderBtn();
+}
 function renderStoreDeliveryChips(){document.getElementById('store-delivery-chips').innerHTML=['持参','配送'].map(v=>{const on=(v==='配送'&&S.storeDelivery)||(v==='持参'&&!S.storeDelivery);return`<div class="chip ${on?'on':''}" onclick="selectStoreDelivery('${v}')">${v}</div>`;}).join('');document.getElementById('store-delivery-box').style.display=S.storeDelivery?'block':'none';}
 function selectStoreDelivery(v){S.storeDelivery=(v==='配送');renderStoreDeliveryChips();if(S.storeDelivery){document.getElementById('store-delivery-to-chips').innerHTML=['先方オフィス','ホテル','自宅'].map(t=>`<div class="chip ${S.storeDeliveryTo===t?'on':''}" onclick="selectStoreDeliveryTo('${t}')">${t}</div>`).join('');}}
 function selectStoreDeliveryTo(v){S.storeDeliveryTo=v;document.getElementById('store-delivery-to-chips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.textContent===v));}
-function setStoreDate(v){S.storeDate=v;if(v){const d=new Date(v+'T00:00:00');document.getElementById('store-date-display').textContent=(d.getMonth()+1)+'月'+d.getDate()+'日';document.getElementById('store-date-display').style.color='#1c1c1e';document.getElementById('store-date-clear').style.display='inline';}}
-function clearStoreDate(){S.storeDate='';document.getElementById('store-date-input').value='';document.getElementById('store-date-display').textContent='タップして日付を選ぶ';document.getElementById('store-date-display').style.color='#8e8e93';document.getElementById('store-date-clear').style.display='none';}
+function setStoreDate(v){S.storeDate=v;document.getElementById('store-date-clear-wrap').style.display=v?'block':'none';}
+function clearStoreDate(){S.storeDate='';document.getElementById('store-date-input').value='';document.getElementById('store-date-clear-wrap').style.display='none';}
 function changeStoreQty(d){S.storeQty=Math.max(1,S.storeQty+d);document.getElementById('store-qty-display').textContent=S.storeQty;}
-function updateStoreOrderBtn(){const btn=document.getElementById('store-order-btn');if(!btn)return;const ok=S.storePerson&&S.storeOrderCompany&&S.storePurpose;btn.disabled=!ok;btn.style.opacity=ok?'1':'0.3';}
+function updateStoreOrderBtn(){const btn=document.getElementById('store-order-btn');if(!btn)return;const ok=S.storePerson&&S.storeOrderCompany&&S.storePurposes.length>0;btn.disabled=!ok;btn.style.opacity=ok?'1':'0.3';}
 function updateStoreCompanyList(){const el=document.getElementById('store-company-suggestions');const wrap=document.getElementById('store-company-suggestions-wrap');if(!el||!wrap)return;const q=S.storeOrderCompany.trim();if(!q){wrap.style.display='none';el.innerHTML='';return;}const past=[...new Set(S.historyData.map(h=>h.company))].filter(Boolean);const filtered=past.filter(c=>c.includes(q));if(!filtered.length){wrap.style.display='none';el.innerHTML='';return;}wrap.style.display='block';el.innerHTML=filtered.map(c=>`<div style="font-size:13px;padding:8px 12px;border-radius:10px;border:1px solid #e5e5ea;cursor:pointer;background:#fff" onclick="selectStoreCompany('${c}')">${c}</div>`).join('');}
 function selectStoreCompany(c){S.storeOrderCompany=c;document.getElementById('store-order-company').value=c;document.getElementById('store-company-suggestions-wrap').style.display='none';updateStoreOrderBtn();}
+
 async function sendStoreOrder(){
   const g=S.selectedStoreProduct;
   if(!g||!S.storePerson||!S.storeOrderCompany)return;
@@ -514,57 +752,41 @@ async function sendStoreOrder(){
   btn.disabled=true;btn.textContent='記録中...';
   const today=new Date();
   const dateStr=(today.getMonth()+1)+'/'+today.getDate();
-  S.historyData.unshift({company:S.storeOrderCompany,date:S.storeDate?S.storeDate.slice(5).replace('-','/'):dateStr,rawDate:S.storeDate||today.toISOString(),name:g.name,shop:g.shop,loc:g.loc,detail:g.shop+'｜'+(g.detail||'')+'｜¥'+(g.price?g.price.toLocaleString():'要確認'),person:S.storePerson+'（'+S.storeDept+'）',purpose:S.storePurpose,delivery:S.storeDelivery});
+  const purposeStr=S.storePurposes.join('・');
+  S.historyData.unshift({
+    company:S.storeOrderCompany,
+    date:S.storeDate?S.storeDate.slice(5).replace('-','/'):dateStr,
+    rawDate:S.storeDate||today.toISOString(),
+    name:g.name,shop:g.shop,loc:g.loc,
+    detail:g.shop+'｜'+(g.detail||'')+'｜¥'+(g.price?g.price.toLocaleString():'要確認'),
+    person:S.storePerson+'（'+S.storeDept+'）',
+    purpose:purposeStr,delivery:S.storeDelivery,
+  });
   try {
-    const row=[S.storeOrderCompany,g.name,S.storeQty,g.shop,g.detail||'',g.price||'',S.storePerson+'（'+S.storeDept+'）',S.storePurpose,S.storeDate||'',S.storeDelivery?'配送':'持参',S.storeDeliveryTo||'',new Date().toLocaleDateString('ja-JP')];
+    const row=[S.storeOrderCompany,g.name,S.storeQty,g.shop,g.detail||'',g.price||'',
+      S.storePerson+'（'+S.storeDept+'）',purposeStr,S.storeDate||'',
+      S.storeDelivery?'配送':'持参',S.storeDeliveryTo||'',new Date().toLocaleDateString('ja-JP')];
     await fetch(SHEETS_URL+'?action=addHistory&data='+encodeURIComponent(JSON.stringify(row)),{redirect:'follow'});
   } catch(e){console.log('記録エラー:',e);}
   document.getElementById('store-order-result').innerHTML=`<div class="sent-wrap"><div class="sent-icon">✓</div><div style="font-size:17px;font-weight:700;margin-bottom:8px">発注・記録完了</div><div style="font-size:13px;color:#8e8e93;line-height:1.7">グループLINEに通知しました。</div><button class="go-btn" style="margin-top:20px" onclick="resetMode()">トップに戻る</button></div>`;
-  btn.style.display='none'; renderHistoryFilters();
+  btn.style.display='none';renderHistoryFilters();
 }
 
-function showPage(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');const idx={'search':0,'history':1}[page];document.querySelectorAll('.nav-btn')[idx].classList.add('active');if(page==='history')renderHistory();}
-function renderDeptTabs(){document.getElementById('dept-tabs').innerHTML=Object.keys(DEPTS).map(d=>`<div class="tab ${S.dept===d?'on':''}" onclick="selectDept('${d}')">${d}</div>`).join('');}
-function selectDept(d){S.dept=d;S.person=null;renderDeptTabs();renderMemberChips();updateGoBtn();}
-function renderMemberChips(){document.getElementById('member-chips').innerHTML=DEPTS[S.dept].map(m=>`<div class="chip ${S.person===m?'on':''}" onclick="selectMember('${m}')">${m}</div>`).join('');}
-function selectMember(m){S.person=m;renderMemberChips();updateGoBtn();}
-function renderPurposeChips(){document.getElementById('purpose-chips').innerHTML=['会食','訪問','御礼','謝罪'].map(v=>`<div class="chip ${S.purpose===v?'on':''}" onclick="selectPurpose('${v}')">${v}</div>`).join('');}
-function selectPurpose(v){S.purpose=v;renderPurposeChips();updateGoBtn();}
-function renderRoleChips(){document.getElementById('role-chips').innerHTML=['担当者','部長・課長','役員・社長'].map(v=>`<div class="chip ${S.role===v?'on':''}" onclick="selectRole('${v}')">${v}</div>`).join('');}
-function selectRole(v){S.role=v;renderRoleChips();updateGoBtn();}
-function renderRegionChips(){document.getElementById('region-chips').innerHTML=['福岡（地元）','九州内','県外'].map(v=>`<div class="chip ${S.region===v?'on':''}" onclick="selectRegion('${v}')">${v}</div>`).join('');}
-function selectRegion(v){S.region=v;renderRegionChips();updateGoBtn();}
-function setDate(v){S.date=v;if(v){const d=new Date(v+'T00:00:00');document.getElementById('date-display-text').textContent=(d.getMonth()+1)+'月'+d.getDate()+'日';document.getElementById('date-display-text').style.color='#1c1c1e';document.getElementById('date-clear').style.display='inline';}}
-function clearDate(){S.date='';document.getElementById('date-input').value='';document.getElementById('date-display-text').textContent='タップして日付を選ぶ';document.getElementById('date-display-text').style.color='#8e8e93';document.getElementById('date-clear').style.display='none';}
-const BUDGET_OPTIONS=[{label:'指定なし',min:0,max:99999},{label:'〜¥3,000',min:0,max:3000},{label:'¥3,000〜¥5,000',min:3000,max:5000},{label:'¥5,000〜¥10,000',min:5000,max:10000},{label:'¥10,000〜¥15,000',min:10000,max:15000}];
-function renderBudgetChips(){const el=document.getElementById('budget-chips');if(!el)return;el.innerHTML=BUDGET_OPTIONS.map(o=>`<div class="chip ${S.budgetLabel===o.label?'on':''}" onclick="selectBudget('${o.label}',${o.min},${o.max})">${o.label}</div>`).join('');}
-function selectBudget(label,min,max){S.budgetLabel=label;S.budgetMin=min;S.budgetMax=max;renderBudgetChips();updateGoBtn();}
-function renderDeliveryChips(){const el=document.getElementById('delivery-chips');el.innerHTML=['持参','配送'].map(v=>{const on=(v==='配送'&&S.delivery)||(v==='持参'&&!S.delivery);return`<div class="chip ${on?'on':''}" onclick="selectDelivery('${v}')">${v}</div>`;}).join('');document.getElementById('delivery-box').style.display=S.delivery?'block':'none';}
-function selectDelivery(v){S.delivery=(v==='配送');renderDeliveryChips();if(S.delivery){const el=document.getElementById('delivery-to-chips');el.innerHTML=['先方オフィス','ホテル','自宅'].map(t=>`<div class="chip ${S.deliveryTo===t?'on':''}" onclick="selectDeliveryTo('${t}')">${t}</div>`).join('');}}
-function selectDeliveryTo(v){S.deliveryTo=v;document.getElementById('delivery-to-chips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.textContent===v));}
-function updateGoBtn(){const btn=document.getElementById('go-btn');const ok=S.person&&S.purpose&&S.role&&S.region;btn.disabled=!ok;btn.textContent=ok?`${S.person}さんの候補を生成 ↗`:'条件をすべて選んでください';}
-function daysLeft(){if(!S.date)return null;return Math.round((new Date(S.date)-new Date())/86400000);}
-function expiryAlert(g){const d=daysLeft();if(d!==null&&g.expiry&&d>g.expiry)return`渡す日まで${d}日。賞味期限（約${g.expiry}日）に注意`;return null;}
-async function generateCandidates(){const resultArea=document.getElementById('result-area');const btn=document.getElementById('go-btn');btn.disabled=true;btn.textContent='生成中...';resultArea.innerHTML='<div class="loading"><div class="spinner"></div>AIが候補を選定しています...</div>';const params={person:S.person,dept:S.dept,purpose:S.purpose,role:S.role,region:S.region,date:S.date,budgetLabel:S.budgetLabel,budgetMin:S.budgetMin,budgetMax:S.budgetMax,delivery:S.delivery,deliveryTo:S.deliveryTo};try{const res=await fetch(SHEETS_URL+'?action=ai&params='+encodeURIComponent(JSON.stringify(params)),{redirect:'follow'});const text=await res.text();const data=JSON.parse(text);if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));if(!data.choices||!data.choices[0])throw new Error('AIからの応答が不正です。もう一度お試しください。');const content=data.choices[0].message.content;const picks=JSON.parse(content.replace(/```json|```/g,'').trim());const results=picks.map(p=>({...S.gifts.find(g=>g.id==p.id),reason:p.reason,tag:p.tag})).filter(Boolean);renderResults(results);}catch(e){resultArea.innerHTML=`<div class="error-box">エラー：${e.message||'生成に失敗しました'}</div>`;}btn.disabled=false;btn.textContent=`${S.person}さんの候補を生成 ↗`;}
-function renderResults(gifts){let html=`<div class="result-header">おすすめ候補 ${gifts.length}件（タップで詳細）</div>`;gifts.forEach(g=>{const al=expiryAlert(g);html+=`<div class="gift-card" onclick="showModal(${JSON.stringify(g).replace(/"/g,'&quot;')})"><div class="gift-img-wrap">${g.photo1?`<img src="${g.photo1}" onerror="this.parentNode.innerHTML='写真なし'">` :'写真なし'}</div><div class="gift-body"><div class="gift-name">${g.name}</div><div class="gift-shop">${g.shop}（${g.loc}）</div><div class="gift-foot"><span class="gift-price">${g.price?'¥'+g.price.toLocaleString():'要確認'}</span><div class="badges"><span class="badge">${g.tag||g.cat}</span>${g.cold?'<span class="badge badge-warn">要冷蔵</span>':''}${g.season?`<span class="badge badge-season">${g.season}</span>`:''} ${al?'<span class="badge badge-danger">期限注意</span>':''}</div></div><div class="gift-reason">${g.reason||''}</div>${al?`<div class="expiry-alert">${al}</div>`:''}</div></div>`;});document.getElementById('result-area').innerHTML=html;}
-function showModal(gStr){const g=typeof gStr==='string'?JSON.parse(gStr.replace(/&quot;/g,'"')):gStr;S.pickedGift=g;const al=expiryAlert(g);document.getElementById('modal-content').innerHTML=`<div class="modal-handle"></div><div class="modal-img-wrap">${g.photo1?`<img src="${g.photo1}" onerror="this.parentNode.innerHTML='写真なし'">` :'写真なし'}</div><div class="modal-name">${g.name}</div><div class="modal-shop">${g.shop}（${g.loc}）</div><div class="modal-row"><span class="modal-lbl">内容</span><span class="modal-val">${g.detail||'—'}</span></div><div class="modal-row"><span class="modal-lbl">価格（税込）</span><span class="modal-val">${g.price?'¥'+g.price.toLocaleString():'要確認'}</span></div><div class="modal-row"><span class="modal-lbl">要冷蔵</span><span class="modal-val ${g.cold?'warn':''}">${g.cold?'要冷蔵':'不要'}</span></div><div class="modal-row"><span class="modal-lbl">賞味期限目安</span><span class="modal-val ${al?'danger':''}">約${g.expiry||'—'}日${al?' ⚠':''}</span></div>${g.season?`<div class="modal-row"><span class="modal-lbl">季節限定</span><span class="modal-val">${g.season}</span></div>`:''}<div class="modal-row"><span class="modal-lbl">備考</span><span class="modal-val">${g.note||'—'}</span></div><div class="modal-row"><span class="modal-lbl">おすすめ理由</span><span class="modal-val">${g.reason||'—'}</span></div>${S.delivery?`<div class="modal-row"><span class="modal-lbl">配送先</span><span class="modal-val">${S.deliveryTo||'—'}${S.deliveryAddr?' / '+S.deliveryAddr:''}</span></div>`:''}<button class="order-btn" onclick="showOrder()">手土産発注 ↗</button><button class="modal-close" onclick="closeModalDirect()">閉じる</button>`;document.getElementById('modal-overlay').classList.add('open');}
-function closeModal(e){if(e.target===document.getElementById('modal-overlay'))closeModalDirect();}
-function closeModalDirect(){document.getElementById('modal-overlay').classList.remove('open');}
-function showOrder(){S.orderSent=false;S.orderQty=1;renderOrderSheet();document.getElementById('order-overlay').classList.add('open');}
-function closeOrder(e){if(e.target===document.getElementById('order-overlay'))document.getElementById('order-overlay').classList.remove('open');}
-function changeQty(delta){S.orderQty=Math.max(1,S.orderQty+delta);const el=document.getElementById('qty-display');if(el)el.textContent=S.orderQty;const sq=document.getElementById('summary-qty');if(sq)sq.textContent=S.orderQty+'個';}
-function renderOrderSheet(){const g=S.pickedGift;if(S.orderSent){document.getElementById('order-content').innerHTML=`<div class="modal-handle"></div><div class="sent-wrap"><div class="sent-icon">✓</div><div style="font-size:18px;font-weight:700;margin-bottom:8px">発注・履歴記録完了</div><div style="font-size:14px;color:#8e8e93;line-height:1.7">グループLINEに通知しました。</div><button class="send-execute" style="margin-top:24px" onclick="document.getElementById('order-overlay').classList.remove('open');document.getElementById('modal-overlay').classList.remove('open')">閉じる</button></div>`;return;}document.getElementById('order-content').innerHTML=`<div class="modal-handle"></div><div class="order-title">手土産発注・履歴記録</div><div class="order-sub">お渡し先を入力して記録してください</div><div class="lbl" style="margin-bottom:6px">お渡し先の会社名</div><input type="text" id="order-company" placeholder="例：丸紅不動産" value="${S.orderCompany||''}" oninput="S.orderCompany=this.value;updateOrderBtn();updateCompanyList()" style="margin-bottom:6px"><div id="company-suggestions-wrap" style="display:none;margin-bottom:12px"><div style="display:flex;flex-direction:column;gap:3px" id="company-suggestions"></div></div><div class="lbl" style="margin-bottom:8px">発注個数</div><div class="qty-row"><button class="qty-btn" onclick="changeQty(-1)">−</button><span class="qty-num" id="qty-display">${S.orderQty}</span><button class="qty-btn" onclick="changeQty(1)">＋</button><span style="font-size:13px;color:#8e8e93">個</span></div><div class="order-summary">商品：<span>${g.name}</span><br>店舗：<span>${g.shop}（${g.loc}）</span><br>価格：<span>¥${g.price?g.price.toLocaleString():'要確認'}</span><br>個数：<span id="summary-qty">${S.orderQty}個</span><br>発注者：<span>${S.person}（${S.dept}）</span><br>目的：<span>${S.purpose}</span><br>渡す日：<span>${S.date||'未定'}</span><br>${S.delivery?`配送先：<span>${S.deliveryTo||'—'}</span>`:'持参'}</div><button class="send-execute" id="record-btn" onclick="sendOrder()" ${!S.orderCompany?'disabled style="opacity:0.35"':''}>発注し履歴に記録する ↗</button><button style="margin-top:8px;width:100%;padding:12px;font-size:14px;border-radius:14px;border:1px solid #d1d1d6;background:none;color:#8e8e93;cursor:pointer" onclick="document.getElementById('order-overlay').classList.remove('open')">戻る</button>`;}
-function selectCompany(c){S.orderCompany=c;const inp=document.getElementById('order-company');if(inp)inp.value=c;const wrap=document.getElementById('company-suggestions-wrap');if(wrap)wrap.style.display='none';updateOrderBtn();}
-function updateCompanyList(){const el=document.getElementById('company-suggestions');const wrap=document.getElementById('company-suggestions-wrap');if(!el||!wrap)return;const q=S.orderCompany.trim();if(!q){wrap.style.display='none';el.innerHTML='';return;}const past=[...new Set(S.historyData.map(h=>h.company))].filter(Boolean);const filtered=past.filter(c=>c.includes(q));if(!filtered.length){wrap.style.display='none';el.innerHTML='';return;}wrap.style.display='block';el.innerHTML=filtered.map(c=>`<div style="font-size:13px;padding:8px 12px;border-radius:10px;border:1px solid #e5e5ea;cursor:pointer;background:#fff" onclick="selectCompany('${c}')">${c}</div>`).join('');}
-function updateOrderBtn(){const btn=document.querySelector('.send-execute');if(btn){btn.disabled=!S.orderCompany;btn.style.opacity=S.orderCompany?'1':'0.35';}}
-async function sendOrder(){const g=S.pickedGift;if(!S.orderCompany)return;const btn=document.getElementById('record-btn');if(btn){btn.disabled=true;btn.textContent='記録中...';}const today=new Date();const dateStr=(today.getMonth()+1)+'/'+today.getDate();S.historyData.unshift({company:S.orderCompany,date:S.date?S.date.slice(5).replace('-','/'):dateStr,rawDate:S.date||today.toISOString(),name:g.name,shop:g.shop,loc:g.loc,detail:g.shop+'｜'+(g.detail||'')+'｜¥'+(g.price?g.price.toLocaleString():'要確認'),person:S.person,purpose:S.purpose,delivery:S.delivery});try{const row=[S.orderCompany,g.name,S.orderQty,g.shop,g.detail||'',g.price||'',S.person+'（'+S.dept+'）',S.purpose,S.date||'',S.delivery?'配送':'持参',S.deliveryTo||'',new Date().toLocaleDateString('ja-JP')];await fetch(SHEETS_URL+'?action=addHistory&data='+encodeURIComponent(JSON.stringify(row)),{redirect:'follow'});}catch(e){console.log('履歴書き込みエラー:',e);}S.orderSent=true;renderOrderSheet();renderHistoryFilters();}
-function renderHistoryFilters(){const companies=['すべて',...new Set(S.historyData.map(h=>h.company))];document.getElementById('history-filters').innerHTML=companies.map(c=>`<div class="filter-chip ${S.hFilter===c?'on':''}" onclick="selectHFilter('${c}')">${c}</div>`).join('');}
+// ===== 履歴（詳細検索強化・時系列） =====
+function renderHistoryFilters(){
+  const companies=['すべて',...new Set(S.historyData.map(h=>h.company))];
+  document.getElementById('history-filters').innerHTML=companies.map(c=>`<div class="filter-chip ${S.hFilter===c?'on':''}" onclick="selectHFilter('${c}')">${c}</div>`).join('');
+}
 function selectHFilter(c){S.hFilter=c;renderHistoryFilters();renderHistory();}
 function renderHistory(){
   const q=(document.getElementById('history-search')?.value||'').trim();
   let filtered=S.historyData;
-  if(q)filtered=filtered.filter(h=>h.company.includes(q)||h.name.includes(q)||h.person.includes(q));
-  if(S.hFilter!=='すべて')filtered=filtered.filter(h=>h.company===S.hFilter);
+  // 詳細検索：社名・支店名含む全フィールド対象
+  if(q) filtered=filtered.filter(h=>
+    h.company.includes(q)||h.name.includes(q)||h.person.includes(q)||
+    h.shop.includes(q)||h.purpose.includes(q)||h.detail.includes(q)
+  );
+  if(S.hFilter!=='すべて') filtered=filtered.filter(h=>h.company===S.hFilter);
   const el=document.getElementById('history-content');
   if(!filtered.length){el.innerHTML='<div class="no-result">該当する履歴がありません</div>';return;}
   el.innerHTML=filtered.map(h=>{
@@ -578,7 +800,10 @@ function renderHistory(){
         <div class="h-detail">${h.company}｜¥${h.detail.split('¥')[1]||''}</div>
         <div class="h-footer">
           <span class="h-person">${h.person}</span>
-          <div class="badges"><span class="badge ${h.purpose==='謝罪'?'badge-warn':''}">${h.purpose}</span>${h.delivery?'<span class="badge">配送</span>':''}</div>
+          <div class="badges">
+            <span class="badge ${h.purpose.includes('謝罪')?'badge-warn':''}">${h.purpose}</span>
+            ${h.delivery?'<span class="badge">配送</span>':''}
+          </div>
         </div>
       </div>
     </div>`;
