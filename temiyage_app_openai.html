@@ -162,12 +162,6 @@ input[type=date] { cursor: pointer; }
     <div class="section">
       <div class="lbl">訪問目的（複数選択可）</div>
       <div class="chips" id="purpose-chips"></div>
-      <div id="departure-box" style="display:none;margin-top:10px">
-        <div class="departure-box">
-          <div class="lbl">出発時間</div>
-          <input type="time" id="departure-time" style="margin-top:4px">
-        </div>
-      </div>
     </div>
     <div class="section">
       <div class="lbl">雰囲気・こだわり（複数選択可）</div>
@@ -175,9 +169,12 @@ input[type=date] { cursor: pointer; }
     </div>
     <hr class="divider">
     <div class="section">
-      <div class="lbl">渡す日</div>
-      <input type="date" id="date-input" onchange="setDate(this.value)" style="margin-bottom:4px">
-      <div id="date-clear-wrap" style="display:none;text-align:right">
+      <div class="lbl">渡す日・出発時間</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="date" id="date-input" onchange="setDate(this.value)" style="flex:1">
+        <input type="time" id="departure-time" style="width:110px">
+      </div>
+      <div id="date-clear-wrap" style="display:none;text-align:right;margin-top:4px">
         <span style="font-size:12px;color:#8e8e93;cursor:pointer" onclick="clearDate()">× クリア</span>
       </div>
     </div>
@@ -497,8 +494,24 @@ async function generateCandidates(){
     if(!data.choices||!data.choices[0])throw new Error('AIからの応答が不正です。もう一度お試しください。');
     const content=data.choices[0].message.content;
     const picks=JSON.parse(content.replace(/```json|```/g,'').trim());
-    // キープ以外の新しい候補
-    const newResults=picks.map(p=>({...S.gifts.find(g=>g.id==p.id),reason:p.reason,tag:p.tag})).filter(g=>g&&!S.keptIds.has(g.id));
+
+    // vibeカラムのマッピング
+    const vibeKeyMap = {
+      '大人数': 'vibeTaisu', 'シニア': 'vibeSenior', '高級感': 'vibeKoukyuu',
+      '福岡銘菓': 'vibeFukuoka', 'ごはんのおとも': 'vibeGohan',
+      '軽い': 'vibeKarui', '塩味': 'vibeShioaji'
+    };
+
+    // AIの候補をマッピング（キープ除外）
+    let newResults = picks.map(p=>({...S.gifts.find(g=>g.id==p.id),reason:p.reason,tag:p.tag})).filter(g=>g&&!S.keptIds.has(g.id));
+
+    // vibesが選択されている場合、フロント側でもフィルタリング
+    if(S.vibes.length > 0) {
+      const vibeFiltered = newResults.filter(g => S.vibes.some(v => g[vibeKeyMap[v]]));
+      // フィルター後に結果がある場合のみ適用
+      if(vibeFiltered.length >= 2) newResults = vibeFiltered;
+    }
+
     // キープ済み＋新候補を合わせて表示
     renderResults([...keptGifts.map(g=>({...g,kept:true})), ...newResults]);
   } catch(e){
