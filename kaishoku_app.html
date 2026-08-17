@@ -62,21 +62,34 @@
     .sort-hint { font-size: 12px; color: #aaa; margin-bottom: 12px; }
     .result-card {
       background: #fff; border-radius: 14px; border: 1px solid #E8E6E1;
-      margin-bottom: 10px; overflow: hidden; transition: box-shadow .2s;
+      margin-bottom: 10px; overflow: hidden;
     }
-    .result-card.dragging { opacity: .4; box-shadow: 0 8px 24px rgba(0,0,0,.12); cursor: grabbing; }
-    .result-card.drag-over { border-color: #1D9E75; border-width: 2px; }
     .shop-photo { width: 100%; height: 150px; object-fit: cover; display: block; }
     .card-inner { padding: 14px 16px; }
     .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px; }
     .result-header-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
-    .drag-handle { color: #ccc; font-size: 16px; flex-shrink: 0; line-height: 1; }
     .shop-name { font-size: 16px; font-weight: 600; color: #1a1a1a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .result-header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .rank-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+    .rank-dropdown { position: relative; }
+    .rank-badge {
+      font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 20px;
+      cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; font-family: inherit;
+    }
     .rank-1 { background: #FFF8E1; color: #633806; border: 1px solid #EF9F27; }
     .rank-2 { background: #F1EFE8; color: #444441; border: 1px solid #B4B2A9; }
     .rank-3 { background: #F1EFE8; color: #444441; border: 1px solid #B4B2A9; }
+    .rank-menu {
+      position: absolute; right: 0; top: 100%; margin-top: 4px; background: #fff;
+      border: 1px solid #D8D6D1; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.12);
+      z-index: 20; min-width: 120px; overflow: hidden;
+    }
+    .rank-menu-item {
+      display: block; width: 100%; text-align: left; padding: 10px 14px; border: none;
+      background: #fff; font-size: 13px; font-family: inherit; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .rank-menu-item:hover { background: #F7F6F3; }
+    .rank-menu-item.danger { color: #c0392b; }
     .btn-exclude {
       background: none; border: none; color: #ccc; font-size: 20px; cursor: pointer;
       padding: 0 2px; line-height: 1; transition: color .15s; -webkit-tap-highlight-color: transparent;
@@ -256,7 +269,7 @@
 
   <div id="results">
     <div class="results-header">AI提案結果</div>
-    <div class="sort-hint">⠿ 長押しでドラッグして順番を変更 ／ ✕ で候補を除外</div>
+    <div class="sort-hint">順位をタップして「1位」「2位」「削除」を選択 ／ ✕ で候補を除外</div>
      <span class="btn-reset" onclick="resetForm()" style="margin-bottom:10px;">← 検索に戻る</span>
     <div id="result-cards"></div>
 <button class="btn-line" id="line-btn" onclick="sendLine()">LINE で予約リクエストを送信する</button>
@@ -362,7 +375,7 @@ function renderResults(shops) {
     const budgetText = (shop.budgetMin && shop.budgetMax)
       ? Number(shop.budgetMin).toLocaleString() + '〜' + Number(shop.budgetMax).toLocaleString() + '円/人' : '';
     const mapBtn = shop.mapUrl
-      ? '<a class="btn-sub map" href="' + shop.mapUrl + '" target="_blank" rel="noopener">Googleマップ</a>' : '';
+      ? '<a class="btn-sub map" href="' + shop.mapUrl + '" target="_blank" rel="noopener">地図</a>' : '';
     const webBtn = shop.webUrl
       ? '<a class="btn-sub" href="' + shop.webUrl + '" target="_blank" rel="noopener">ネット予約</a>' : '';
     const cautionHtml = shop.caution ? '<div class="caution">⚠ ' + shop.caution + '</div>' : '';
@@ -374,17 +387,23 @@ function renderResults(shops) {
     const card = document.createElement('div');
     card.className = 'result-card';
     card.dataset.index = i;
-    card.draggable = true;
     card.innerHTML =
       photoHtml +
       '<div class="card-inner">' +
         '<div class="result-header">' +
           '<div class="result-header-left">' +
-            '<span class="drag-handle">⠿</span>' +
             '<span class="shop-name">' + shop.name + '</span>' +
+            mapBtn +
           '</div>' +
           '<div class="result-header-right">' +
-            '<span class="rank-badge ' + rankClass[i] + '">' + rankLabels[i] + '</span>' +
+            '<div class="rank-dropdown">' +
+              '<button type="button" class="rank-badge ' + rankClass[i] + '" onclick="toggleRankMenu(this)">' + rankLabels[i] + ' ▾</button>' +
+              '<div class="rank-menu" hidden>' +
+                '<button type="button" class="rank-menu-item" onclick="applyRankChange(this,0)">1位にする</button>' +
+                '<button type="button" class="rank-menu-item" onclick="applyRankChange(this,1)">2位にする</button>' +
+                '<button type="button" class="rank-menu-item danger" onclick="applyRankChange(this,\'remove\')">削除</button>' +
+              '</div>' +
+            '</div>' +
             '<button class="btn-exclude" onclick="excludeCard(this)" title="除外">✕</button>' +
           '</div>' +
         '</div>' +
@@ -392,16 +411,12 @@ function renderResults(shops) {
         '<div class="tag-group">' + usageTags + '</div>' +
         '<div class="ai-reason">' + shop.reason + '</div>' +
         cautionHtml +
-        '<div class="shop-actions">' + mapBtn +
-          (shop.phone ? '<button class="btn-sub" onclick="callTel(\'' + shop.phone + '\')">電話：' + shop.phone + '</button>' : '') +
-          webBtn +
+        '<div class="shop-actions">' + webBtn +
         '</div>' +
       '</div>';
 
     container.appendChild(card);
   });
-
-  initDragAndDrop();
 }
 
 function excludeCard(btn) {
@@ -422,78 +437,45 @@ function updateRankBadges() {
     const badge = card.querySelector('.rank-badge');
     if (badge && i < 3) {
       badge.className = 'rank-badge ' + rankClass[i];
-      badge.textContent = rankLabels[i];
+      badge.textContent = rankLabels[i] + ' ▾';
     }
   });
 }
 
-function initDragAndDrop() {
+function toggleRankMenu(btn) {
+  document.querySelectorAll('.rank-menu').forEach(function(m) {
+    if (m !== btn.nextElementSibling) m.hidden = true;
+  });
+  const menu = btn.nextElementSibling;
+  menu.hidden = !menu.hidden;
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.rank-dropdown')) {
+    document.querySelectorAll('.rank-menu').forEach(function(m) { m.hidden = true; });
+  }
+});
+
+function applyRankChange(btn, target) {
+  const menu = btn.closest('.rank-menu');
+  menu.hidden = true;
+  const card = btn.closest('.result-card');
+  if (target === 'remove') {
+    excludeCard(btn);
+    return;
+  }
+  moveCard(card, target);
+}
+
+function moveCard(card, targetIndex) {
   const container = document.getElementById('result-cards');
-  let dragEl = null;
-  let touchStartY = 0;
-  let touchEl = null;
-
-  container.addEventListener('dragstart', function(e) {
-    dragEl = e.target.closest('.result-card');
-    if (!dragEl) return;
-    setTimeout(function() { dragEl.classList.add('dragging'); }, 0);
-  });
-  container.addEventListener('dragend', function() {
-    if (dragEl) dragEl.classList.remove('dragging');
-    document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
-    updateRankBadges();
-    dragEl = null;
-  });
-  container.addEventListener('dragover', function(e) {
-    e.preventDefault();
-    const target = e.target.closest('.result-card');
-    if (!target || target === dragEl) return;
-    document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
-    target.classList.add('drag-over');
-    const rect = target.getBoundingClientRect();
-    const mid = rect.top + rect.height / 2;
-    if (e.clientY < mid) {
-      container.insertBefore(dragEl, target);
-    } else {
-      container.insertBefore(dragEl, target.nextSibling);
-    }
-  });
-
-  container.addEventListener('touchstart', function(e) {
-    touchEl = e.target.closest('.result-card');
-    if (!touchEl) return;
-    touchStartY = e.touches[0].clientY;
-  }, { passive: true });
-
-  container.addEventListener('touchmove', function(e) {
-    if (!touchEl) return;
-    e.preventDefault();
-    const touchY = e.touches[0].clientY;
-    touchEl.classList.add('dragging');
-    const elements = document.elementsFromPoint(e.touches[0].clientX, touchY);
-    const target = elements.find(function(el) {
-      return el.classList && el.classList.contains('result-card') && el !== touchEl;
-    });
-    if (target) {
-      document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
-      target.classList.add('drag-over');
-      const rect = target.getBoundingClientRect();
-      if (touchY < rect.top + rect.height / 2) {
-        container.insertBefore(touchEl, target);
-      } else {
-        container.insertBefore(touchEl, target.nextSibling);
-      }
-    }
-  }, { passive: false });
-
-  container.addEventListener('touchend', function() {
-    if (touchEl) {
-      touchEl.classList.remove('dragging');
-      document.querySelectorAll('.result-card').forEach(function(c) { c.classList.remove('drag-over'); });
-      updateRankBadges();
-    }
-    touchEl = null;
-  });
+  const cards = Array.prototype.slice.call(container.querySelectorAll('.result-card'));
+  const currentIndex = cards.indexOf(card);
+  if (currentIndex === targetIndex) return;
+  cards.splice(currentIndex, 1);
+  cards.splice(targetIndex, 0, card);
+  cards.forEach(function(c) { container.appendChild(c); });
+  updateRankBadges();
 }
 
 function callTel(phone) {
